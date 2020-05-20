@@ -199,7 +199,8 @@
                     var node = document.createElement("LI");                 // Create a <li> node
                     var textnode = document.createTextNode(selection.innerHTML);         // Create a text node
                     node.appendChild(textnode);                              // Append the text to <li>
-                    document.getElementById("ingredients").appendChild(node);
+                    //TODO see if removing the adding here fixes db
+                    //document.getElementById("ingredients").appendChild(node);
                     
                     textArea.value = "";
                     $(dropdown).toggle("show");
@@ -298,7 +299,7 @@
                         
                         
                         <div data-for="message" class="col-md-12 form-group">
-                            <label for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
+                            <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
                             <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','myDropdown')"></textarea>
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">

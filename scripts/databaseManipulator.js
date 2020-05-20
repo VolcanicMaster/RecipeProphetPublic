@@ -1,4 +1,4 @@
-window.addEventListener('load', testRun, false);
+//window.addEventListener('load', testRun, false);
 
 function testRun(){
     //setCookie("ingredientsList", getCookie("ingredientsList").concat(",lettuce"), 365);
@@ -21,7 +21,7 @@ function testRun(){
 const list = document.getElementById('ingredients');
 //const titleInput = document.querySelector('#title');
 //const form = document.querySelector('form');
-//const submitBtn = document.querySelector('form button');
+const submitBtn = document.getElementById('easyFilterButton');
 
 // Create an instance of a db object for us to store the open database in
 let db;
@@ -65,9 +65,46 @@ window.onload = function() {
   };
 
   // Create an onsubmit handler so that when the form is submitted the editData() function is run
-  submitBtn.onclick = editData;
+  submitBtn.onclick = addData;
+  //TODO either database is not updating or changes are not being reflected in displayData()
 
+  // Define the addData() function
+  function addData(e) {
+    // prevent default - we don't want the form to submit in the conventional way
+    e.preventDefault();
+
+    // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
+    let newItem = { name: 'TEST' }; //TODO list.lastChild.firstChild.textContent?
+
+    // open a read/write db transaction, ready for adding the data
+    let transaction = db.transaction(['notes_os'], 'readwrite');
+
+    // call an object store that's already been added to the database
+    let objectStore = transaction.objectStore('notes_os');
+
+    // Make a request to add our newItem object to the object store
+    var request = objectStore.add(newItem);
+    request.onsuccess = function() {
+      // Clear the form, ready for adding the next entry
+      //titleInput.value = '';
+      //bodyInput.value = '';
+    };
+
+    // Report on the success of the transaction completing, when everything is done
+    transaction.oncomplete = function() {
+      console.log('Transaction completed: database modification finished.');
+
+      // update the display of data to show the newly added item, by running displayData() again.
+      displayData();
+    };
+
+    transaction.onerror = function() {
+      console.log('Transaction not opened due to error');
+    };
+  }
+    
   // Define the editData() function
+    /*
   function editData(e) {
     // prevent default - we don't want the form to submit in the conventional way
     e.preventDefault();
@@ -113,6 +150,7 @@ window.onload = function() {
     };
     }
   }
+  */
 
   // Define the displayData() function
   function displayData() {
@@ -142,7 +180,7 @@ window.onload = function() {
         list.appendChild(listItem);
 
         // Put the data from the cursor inside the h3 and para
-        h3.textContent = cursor.value.title;
+        h3.textContent = cursor.value.name;
 
         // Store the ID of the data item inside an attribute on the listItem, so we know
         // which item it corresponds to. This will be useful later when we want to delete items
