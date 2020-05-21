@@ -66,15 +66,16 @@ window.onload = function() {
 
   // Create an onsubmit handler so that when the form is submitted the editData() function is run
   submitBtn.onclick = addData;
-  //TODO either database is not updating or changes are not being reflected in displayData()
 
   // Define the addData() function
   function addData(e) {
     // prevent default - we don't want the form to submit in the conventional way
     e.preventDefault();
+    console.log("Begin call to addData");
 
     // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-    let newItem = { name: 'TEST' }; //TODO list.lastChild.firstChild.textContent?
+    let newItem = { name: "TEMP" }; //TODO list.lastChild.firstChild.textContent?
+      //TODO create global variable instead of text on the screen?
 
     // open a read/write db transaction, ready for adding the data
     let transaction = db.transaction(['notes_os'], 'readwrite');
@@ -174,7 +175,9 @@ window.onload = function() {
         const listItem = document.createElement('li');
         const h3 = document.createElement('h3');
         const para = document.createElement('p');
-
+        
+          h3.style.float = "left";
+          //para.style.float = "left";
         listItem.appendChild(h3);
         listItem.appendChild(para);
         list.appendChild(listItem);
@@ -201,7 +204,7 @@ window.onload = function() {
         // Again, if list item is empty, display a 'No notes stored' message
         if(!list.firstChild) {
           const listItem = document.createElement('li');
-          listItem.textContent = 'No notes stored.'
+          listItem.textContent = 'No ingredients selected.'
           list.appendChild(listItem);
         }
         // if there are no more cursor items to iterate through, say so
@@ -232,7 +235,7 @@ window.onload = function() {
       // Again, if list item is empty, display a 'No notes stored' message
       if(!list.firstChild) {
         const listItem = document.createElement('li');
-        listItem.textContent = 'No notes stored.';
+        listItem.textContent = 'No ingredients selected.';
         list.appendChild(listItem);
       }
     };

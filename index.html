@@ -24,6 +24,7 @@
     <style>
         
     /*class="form-control-label mbr-fonts-style display-7"*/
+        
     label {
         cursor: auto !important;
     }
@@ -98,115 +99,6 @@
       display:none;
     }
     </style>
-    
-  <script src="scripts/databaseManipulator.js"></script>
-    <script>
-                
-                document.onclick = function(e){
-                    //add this clickoff functionality to all dropdowns 
-                    if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
-                      document.getElementById('easyFilter').style.display = 'none';
-                    }
-                    if(e.target.id !== 'lightFilter' && e.target.id !== 'lightFilterButton'){
-                      document.getElementById('lightFilter').style.display = 'none';
-                    }
-                    if(e.target.id !== 'myDropdown' && e.target.id !== 'search'){
-                      document.getElementById('myDropdown').style.display = 'none';
-                    }
-                };
-                /* WORKING DROPDOWN AND FUZZY SEARCH
-                When the user clicks on the button,
-                toggle between hiding and showing the dropdown content */
-                    /*
-                function myFunction() {
-                    $(document.getElementById('myDropdown')).toggle("show");
-                  document.getElementById("myDropdown").classList.toggle("show");
-                }*/
-                    
-                function myFunction(dropdownID) {
-                    $(document.getElementById(dropdownID)).toggle("show");
-                  document.getElementById(dropdownID).classList.toggle("show");
-                }
-                    
-                /*
-                function filterFunction() {
-                  var input, filter, ul, li, a, i;
-                  input = document.getElementById("myInput");
-                  filter = input.value.toUpperCase();
-                  div = document.getElementById("myDropdown");
-                  a = div.getElementsByTagName("a");
-                    
-                  for (i = 0; i < a.length; i++) {
-                    txtValue = a[i].textContent || a[i].innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                      a[i].style.display = "";
-                    } else {
-                      a[i].style.display = "none";
-                    }
-                  }
-                }*/
-                    
-                function filterFunction(inputID,dropdownID) {
-                  var input, filter, ul, li, p, i;
-                  input = document.getElementById(inputID);
-                  filter = input.value.toUpperCase();
-                  div = document.getElementById(dropdownID);
-                  p = div.getElementsByTagName("p");
-                    
-                  $(div).show();
-                  //div.classList.show();
-                    
-                  for (i = 0; i < p.length; i++) {
-                    txtValue = p[i].textContent || p[i].innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                      p[i].style.display = "";
-                    } else {
-                      p[i].style.display = "none";
-                    }
-                  }
-                }
-                    
-                    /*
-                function selectElement(){
-                    id = "AboutSelection";
-                    selection = document.getElementById(id);
-                    dropdownButton = document.getElementById("dropdownButton");
-                    dropdown = document.getElementById("myDropdown");
-                    
-                    dropdownButton.innerHTML = selection.innerHTML;
-                    $(dropdown).toggle("show");
-                }*/
-                    
-                function selectElement(id,dropdownID,dropdownButtonID){
-                    //id = "AboutSelection";
-                    selection = document.getElementById(id);
-                    dropdownButton = document.getElementById(dropdownButtonID);
-                    dropdown = document.getElementById(dropdownID);
-                    
-                    dropdownButton.innerHTML = selection.innerHTML;
-                    $(dropdown).toggle("show");
-                }
-                    
-                function selectElementFromTextArea(id,dropdownID,textAreaID){
-                    //id = "AboutSelection";
-                    selection = document.getElementById(id);
-                    dropdown = document.getElementById(dropdownID);
-                    textArea = document.getElementById(textAreaID);
-                    
-                    //TODO add ingredients to database
-                    
-                    
-                    var node = document.createElement("LI");                 // Create a <li> node
-                    var textnode = document.createTextNode(selection.innerHTML);         // Create a text node
-                    node.appendChild(textnode);                              // Append the text to <li>
-                    //TODO see if removing the adding here fixes db
-                    //document.getElementById("ingredients").appendChild(node);
-                    
-                    textArea.value = "";
-                    $(dropdown).toggle("show");
-                    //$(dropdown).hide();
-                }
-                </script>
   
 </head>
 <body>
@@ -311,7 +203,7 @@
                                 <p id="pastaSelection" onclick="selectElementFromTextArea('pastaSelection','myDropdown','search')">Pasta / Noodles</p>
                               </div>
                             </div>
-                            <ul name="ingredients" id="ingredients">Ingredients: </ul>
+                            <ul class="ingredientsUL" name="ingredients" id="ingredients">Ingredients: </ul>
                             
                             <div class="dropdown">
                               <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Difficulty Preference</button>
@@ -442,7 +334,113 @@
     </div>
 </section>
 
-
+    <script>
+                document.onclick = function(e){
+                    //add this clickoff functionality to all dropdowns 
+                    if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
+                      document.getElementById('easyFilter').style.display = 'none';
+                    }
+                    if(e.target.id !== 'lightFilter' && e.target.id !== 'lightFilterButton'){
+                      document.getElementById('lightFilter').style.display = 'none';
+                    }
+                    if(e.target.id !== 'myDropdown' && e.target.id !== 'search'){
+                      document.getElementById('myDropdown').style.display = 'none';
+                    }
+                };
+                /* WORKING DROPDOWN AND FUZZY SEARCH
+                When the user clicks on the button,
+                toggle between hiding and showing the dropdown content */
+                    /*
+                function myFunction() {
+                    $(document.getElementById('myDropdown')).toggle("show");
+                  document.getElementById("myDropdown").classList.toggle("show");
+                }*/
+                    
+                function myFunction(dropdownID) {
+                    $(document.getElementById(dropdownID)).toggle("show");
+                  document.getElementById(dropdownID).classList.toggle("show");
+                }
+                    
+                /*
+                function filterFunction() {
+                  var input, filter, ul, li, a, i;
+                  input = document.getElementById("myInput");
+                  filter = input.value.toUpperCase();
+                  div = document.getElementById("myDropdown");
+                  a = div.getElementsByTagName("a");
+                    
+                  for (i = 0; i < a.length; i++) {
+                    txtValue = a[i].textContent || a[i].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                      a[i].style.display = "";
+                    } else {
+                      a[i].style.display = "none";
+                    }
+                  }
+                }*/
+                    
+                function filterFunction(inputID,dropdownID) {
+                  var input, filter, ul, li, p, i;
+                  input = document.getElementById(inputID);
+                  filter = input.value.toUpperCase();
+                  div = document.getElementById(dropdownID);
+                  p = div.getElementsByTagName("p");
+                    
+                  $(div).show();
+                  //div.classList.show();
+                    
+                  for (i = 0; i < p.length; i++) {
+                    txtValue = p[i].textContent || p[i].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                      p[i].style.display = "";
+                    } else {
+                      p[i].style.display = "none";
+                    }
+                  }
+                }
+                    
+                    /*
+                function selectElement(){
+                    id = "AboutSelection";
+                    selection = document.getElementById(id);
+                    dropdownButton = document.getElementById("dropdownButton");
+                    dropdown = document.getElementById("myDropdown");
+                    
+                    dropdownButton.innerHTML = selection.innerHTML;
+                    $(dropdown).toggle("show");
+                }*/
+                    
+                function selectElement(id,dropdownID,dropdownButtonID){
+                    //id = "AboutSelection";
+                    selection = document.getElementById(id);
+                    dropdownButton = document.getElementById(dropdownButtonID);
+                    dropdown = document.getElementById(dropdownID);
+                    
+                    dropdownButton.innerHTML = selection.innerHTML;
+                    $(dropdown).toggle("show");
+                }
+                    
+                function selectElementFromTextArea(id,dropdownID,textAreaID){
+                    //id = "AboutSelection";
+                    selection = document.getElementById(id);
+                    dropdown = document.getElementById(dropdownID);
+                    textArea = document.getElementById(textAreaID);
+                    
+                    //TODO add ingredients to database
+                    
+                    
+                    var node = document.createElement("LI");                 // Create a <li> node
+                    var textnode = document.createTextNode(selection.innerHTML);         // Create a text node
+                    node.appendChild(textnode);                              // Append the text to <li>
+                    //TODO see if removing the adding here fixes db
+                    //document.getElementById("ingredients").appendChild(node);
+                    
+                    textArea.value = "";
+                    $(dropdown).toggle("show");
+                    //$(dropdown).hide();
+                }
+                </script>
+    <script src="scripts/databaseManipulator.js"></script>
   <script src="assets/web/assets/jquery/jquery.min.js"></script>
   <script src="assets/popper/popper.min.js"></script>
   <script src="assets/bootstrap/js/bootstrap.min.js"></script>
