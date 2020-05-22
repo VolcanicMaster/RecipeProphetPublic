@@ -21,60 +21,19 @@ function testRun(){
 const list = document.getElementById('ingredients');
 //const titleInput = document.querySelector('#title');
 //const form = document.querySelector('form');
-const submitBtn = document.getElementById('easyFilterButton');
+//const submitBtn = document.getElementById('easyFilterButton');
 
 // Create an instance of a db object for us to store the open database in
 let db;
 
-window.onload = function() {
-  // Open our database; it is created if it doesn't already exist
-  // (see onupgradeneeded below)
-  let request = window.indexedDB.open('notes_db', 1);
-
-  // onerror handler signifies that the database didn't open successfully
-  request.onerror = function() {
-    console.log('Database failed to open');
-  };
-
-  // onsuccess handler signifies that the database opened successfully
-  request.onsuccess = function() {
-    console.log('Database opened succesfully');
-
-    // Store the opened database object in the db variable. This is used a lot below
-    db = request.result;
-
-    // Run the displayData() function to display the notes already in the IDB
-    displayData();
-  };
-
-  // Setup the database tables if this has not already been done
-  request.onupgradeneeded = function(e) {
-
-    // Grab a reference to the opened database
-    let db = e.target.result;
-
-    // Create an objectStore to store our notes in (basically like a single table)
-    // including a auto-incrementing key
-    let objectStore = db.createObjectStore('notes_os', { keyPath: 'id', autoIncrement:true });
-
-    // Define what data items the objectStore will contain
-    objectStore.createIndex('name', 'name', { unique: true });
-    // objectStore.createIndex('owned', 'owned', { unique: false });
-
-    console.log('Database setup complete');
-  };
-
-  // Create an onsubmit handler so that when the form is submitted the editData() function is run
-  submitBtn.onclick = addData;
-
-  // Define the addData() function
-  function addData(e) {
+// Define the addData() function
+  function addData(ingredient) {
     // prevent default - we don't want the form to submit in the conventional way
-    e.preventDefault();
+    //e.preventDefault();
     console.log("Begin call to addData");
 
     // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-    let newItem = { name: "TEMP" }; //TODO list.lastChild.firstChild.textContent?
+    let newItem = { name: ingredient }; //TODO list.lastChild.firstChild.textContent?
       //TODO create global variable instead of text on the screen?
 
     // open a read/write db transaction, ready for adding the data
@@ -83,6 +42,12 @@ window.onload = function() {
     // call an object store that's already been added to the database
     let objectStore = transaction.objectStore('notes_os');
 
+      
+    //TODO check if name is already in db?
+      // OR make (hashed) name the id?
+    
+      
+      
     // Make a request to add our newItem object to the object store
     var request = objectStore.add(newItem);
     request.onsuccess = function() {
@@ -103,57 +68,8 @@ window.onload = function() {
       console.log('Transaction not opened due to error');
     };
   }
-    
-  // Define the editData() function
-    /*
-  function editData(e) {
-    // prevent default - we don't want the form to submit in the conventional way
-    e.preventDefault();
 
-    // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-    // let newItem = { title: titleInput.value};
-
-    // open a read/write db transaction, ready for adding the data
-    let transaction = db.transaction(['notes_os'], 'readwrite');
-
-    // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore('notes_os');
-      
-    var request = objectStore.get(key);
-
-    request.onsuccess = function(ev)
-    {
-        var data = ev.target.result;
-        if (data === undefined)
-        {
-            //console.log('Key doesnt exist or has been previously' + 'removed');
-            return;
-        }
-
-        data.text = titleInput.value;
-        // Make a request to add our newItem object to the object store
-        var request = objectStore.put(data);
-        request.onsuccess = function() {
-          // Clear the form, ready for adding the next entry
-          titleInput.value = '';
-        };
-
-        // Report on the success of the transaction completing, when everything is done
-        transaction.oncomplete = function() {
-          console.log('Transaction completed: database modification finished.');
-
-          // update the display of data to show the newly added item, by running displayData() again.
-          displayData();
-        };
-
-        transaction.onerror = function() {
-          console.log('Transaction not opened due to error');
-    };
-    }
-  }
-  */
-
-  // Define the displayData() function
+// Define the displayData() function
   function displayData() {
     // Here we empty the contents of the list element each time the display is updated
     // If you ddn't do this, you'd get duplicates listed each time a new note is added
@@ -213,7 +129,7 @@ window.onload = function() {
     };
   }
 
-  // Define the deleteItem() function
+// Define the deleteItem() function
   function deleteItem(e) {
     // retrieve the name of the task we want to delete. We need
     // to convert it to a number before trying it use it with IDB; IDB key
@@ -240,5 +156,97 @@ window.onload = function() {
       }
     };
   }
+
+window.onload = function() {
+  // Open our database; it is created if it doesn't already exist
+  // (see onupgradeneeded below)
+  let request = window.indexedDB.open('notes_db', 1);
+
+  // onerror handler signifies that the database didn't open successfully
+  request.onerror = function() {
+    console.log('Database failed to open');
+  };
+
+  // onsuccess handler signifies that the database opened successfully
+  request.onsuccess = function() {
+    console.log('Database opened succesfully');
+
+    // Store the opened database object in the db variable. This is used a lot below
+    db = request.result;
+
+    // Run the displayData() function to display the notes already in the IDB
+    displayData();
+  };
+
+  // Setup the database tables if this has not already been done
+  request.onupgradeneeded = function(e) {
+
+    // Grab a reference to the opened database
+    let db = e.target.result;
+
+    // Create an objectStore to store our notes in (basically like a single table)
+    // including a auto-incrementing key
+    let objectStore = db.createObjectStore('notes_os', { keyPath: 'id', autoIncrement:true });
+
+    // Define what data items the objectStore will contain
+    objectStore.createIndex('name', 'name', { unique: true });
+    // objectStore.createIndex('owned', 'owned', { unique: false });
+
+    console.log('Database setup complete');
+  };
+
+  // Create an onsubmit handler so that when the form is submitted the editData() function is run
+  //submitBtn.onclick = addData;
+
+  
+    
+  // Define the editData() function
+    /*
+  function editData(e) {
+    // prevent default - we don't want the form to submit in the conventional way
+    e.preventDefault();
+
+    // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
+    // let newItem = { title: titleInput.value};
+
+    // open a read/write db transaction, ready for adding the data
+    let transaction = db.transaction(['notes_os'], 'readwrite');
+
+    // call an object store that's already been added to the database
+    let objectStore = transaction.objectStore('notes_os');
+      
+    var request = objectStore.get(key);
+
+    request.onsuccess = function(ev)
+    {
+        var data = ev.target.result;
+        if (data === undefined)
+        {
+            //console.log('Key doesnt exist or has been previously' + 'removed');
+            return;
+        }
+
+        data.text = titleInput.value;
+        // Make a request to add our newItem object to the object store
+        var request = objectStore.put(data);
+        request.onsuccess = function() {
+          // Clear the form, ready for adding the next entry
+          titleInput.value = '';
+        };
+
+        // Report on the success of the transaction completing, when everything is done
+        transaction.oncomplete = function() {
+          console.log('Transaction completed: database modification finished.');
+
+          // update the display of data to show the newly added item, by running displayData() again.
+          displayData();
+        };
+
+        transaction.onerror = function() {
+          console.log('Transaction not opened due to error');
+    };
+    }
+  }
+  */
 
 };

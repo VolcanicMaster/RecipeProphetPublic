@@ -334,6 +334,7 @@
     </div>
 </section>
 
+    <script src="scripts/databaseManipulator.js"></script>
     <script>
                 document.onclick = function(e){
                     //add this clickoff functionality to all dropdowns 
@@ -426,21 +427,14 @@
                     dropdown = document.getElementById(dropdownID);
                     textArea = document.getElementById(textAreaID);
                     
-                    //TODO add ingredients to database
-                    
-                    
-                    var node = document.createElement("LI");                 // Create a <li> node
-                    var textnode = document.createTextNode(selection.innerHTML);         // Create a text node
-                    node.appendChild(textnode);                              // Append the text to <li>
-                    //TODO see if removing the adding here fixes db
-                    //document.getElementById("ingredients").appendChild(node);
+                    // add ingredients to database
+                    addData(selection.textContent);
                     
                     textArea.value = "";
                     $(dropdown).toggle("show");
                     //$(dropdown).hide();
                 }
                 </script>
-    <script src="scripts/databaseManipulator.js"></script>
   <script src="assets/web/assets/jquery/jquery.min.js"></script>
   <script src="assets/popper/popper.min.js"></script>
   <script src="assets/bootstrap/js/bootstrap.min.js"></script>
