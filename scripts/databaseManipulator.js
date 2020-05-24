@@ -1,4 +1,4 @@
-//window.addEventListener('load', testRun, false);
+//window.addEventListener('load', displayData, false);
 
 function testRun(){
     //setCookie("ingredientsList", getCookie("ingredientsList").concat(",lettuce"), 365);
