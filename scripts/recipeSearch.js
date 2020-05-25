@@ -5,6 +5,7 @@ const recipeGallery = document.getElementById('recipeProphetRecipeGallery');
       recipeGallery.removeChild(recipeGallery.firstChild);
     }*/
 
+var listOfIngredients = [];
 setUpDatabase.onsuccess = function()
 {
     let objectStore = db.transaction('notes_os').objectStore('notes_os');
@@ -14,13 +15,14 @@ setUpDatabase.onsuccess = function()
 
         // If there is still another data item to iterate through, keep running this code
         if(cursor) {
-            //TODO1 add this ingredient to an easily accessible array
+            //add this ingredient to an easily accessible array
+            listOfIngredients.push(cursor.value.name);
             cursor.continue();
         }
     }
 }
 
-//TODO2 make sure recipeDatabase is open at this point
+//TODO make sure recipeDatabase is open at this point
 
 //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
 var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
@@ -28,7 +30,7 @@ var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x12
 //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
 
-
+//TODO3.3 compile a string for the tags
 
 //displayRecipes that empties and fills the recipeGallery with that list of recipes
 
