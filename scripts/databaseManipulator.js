@@ -157,7 +157,7 @@ let db;
     };
   }
 
-window.onload = function() {
+function setUpDatabase() {
   // Open our database; it is created if it doesn't already exist
   // (see onupgradeneeded below)
   let request = window.indexedDB.open('notes_db', 1);
@@ -250,3 +250,5 @@ window.onload = function() {
   */
 
 };
+
+window.onload = setUpDatabase;
