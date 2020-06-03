@@ -23,8 +23,11 @@ setUpDatabase.onsuccess = function()
 }
 
 //TODO make sure recipeDatabase is open at this point
+//
+//
 
 //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
+//var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
 var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
 //TODO3 searchForRecipes that returns a sorted list of recipes
 //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
