@@ -361,6 +361,18 @@
   <script src="assets/theme/js/script.js"></script>
   <!--<script src="https://cdn.jsdelivr.net/npm/fuse.js@5.2.3"></script>-->
   
+    <?php
+        $user_name = "eoqfgn8xkbmn";
+        $password = "2B!luffy";
+        $database = "database";
+        $server = "127.0.0.1";
+
+        $link = mysqli_connect($server, $user_name, $password, $database);
+
+        //print displays the text on the page
+        print "Connection to the Server opened";
+        //mysqli_close($link);
+    ?>
   
 </body>
 </html>
