@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html  >
 <head>
   <!-- Site made partly with Mobirise Website Builder v4.12.3, https://mobirise.com -->
@@ -40,22 +39,22 @@
         <div class="menu-logo">
             <div class="navbar-brand">
                 <span class="navbar-logo">
-                    <a href="index.html">
+                    <a href="index.php">
                          <img src="assets/images/mbr-122x158.png" alt="Mobirise" title="" style="height: 3.8rem;">
                     </a>
                 </span>
-                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="index.html">
+                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="index.php">
                         Recipe Prophet</a></span>
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
-                    <a class="nav-link link text-white display-4" href="index.html"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
+                    <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
                         
                         About Us
                     </a>
                 </li></ul>
-            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.html"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
+            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
                     Help</a></div>
         </div>
     </nav>
@@ -76,8 +75,8 @@
                 <h3 class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-2">
                     Do you have Tomato?</h3>
                 
-                <div class="mbr-section-btn"><a class="btn btn-md btn-info display-4" href="page2.html">YES</a>
-                    <a class="btn btn-md btn-white display-4" href="page2.html">NO</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-info display-4" href="page2.php">YES</a>
+                    <a class="btn btn-md btn-white display-4" href="page2.php">NO</a></div>
             </div>
         </div>
     </div>

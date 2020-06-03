@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html  >
+<html>
 <head>
   <!-- Site made partly with Mobirise Website Builder v4.12.3, https://mobirise.com -->
   <meta charset="UTF-8">
@@ -118,22 +117,22 @@
         <div class="menu-logo">
             <div class="navbar-brand">
                 <span class="navbar-logo">
-                    <a href="index.html">
+                    <a href="index.php">
                          <img src="assets/images/mbr-122x158.png" alt="Mobirise" title="" style="height: 3.8rem;">
                     </a>
                 </span>
-                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="index.html" id="homeButton">
+                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="index.php" id="homeButton">
                         Recipe Prophet</a></span>
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
-                    <a class="nav-link link text-white display-4" href="index.html"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
+                    <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
                         
                         About Us
                     </a>
                 </li></ul>
-            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.html"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
+            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
                     Help</a></div>
         </div>
     </nav>
@@ -152,7 +151,7 @@
                     Enter Ingredients, <br>Find Recipes</h1>
                 
                 <p class="mbr-text pb-3 mbr-fonts-style display-5">Enter as little as 2 ingredients, and we'll ask you if you have certain other ingredients to find the perfect recipe you can make without leaving home.</p>
-                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="index.html#ingredientForm">FIND RECIPES!</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="index.php#ingredientForm">FIND RECIPES!</a></div>
             </div>
         </div>
     </div>
@@ -233,7 +232,7 @@
                             </div>
                             
                         </div>
-                        <div class="col-md-12 input-group-btn align-center"><a href="page1.html"><button id="submitButton" type="submit" class="btn btn-primary btn-form display-4">FIND RECIPES!</button></a></div>
+                        <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-primary btn-form display-4">FIND RECIPES!</button></a></div>
                         
                     </div>
                 </div><!---Formbuilder Form--->
@@ -268,7 +267,7 @@
         <div class="media-container-row content text-white">
             <div class="col-12 col-md-3">
                 <div class="media-wrap">
-                    <a href="index.html">
+                    <a href="index.php">
                         <img src="assets/images/mbr-122x158.png" alt="Mobirise" title="">
                     </a>
                 </div>
@@ -296,7 +295,7 @@
                 <h5 class="pb-3">
                     Links
                 </h5>
-                <p class="mbr-text"><a class="text-warning" href="index.html">Recipe Prophet Home</a>&nbsp;<br><a class="text-warning" href="index.html">About Us</a><br><a class="text-warning" href="index.html">Help</a></p>
+                <p class="mbr-text"><a class="text-warning" href="index.php">Recipe Prophet Home</a>&nbsp;<br><a class="text-warning" href="index.php">About Us</a><br><a class="text-warning" href="index.php">Help</a></p>
             </div>
         </div>
         <div class="footer-lower">
@@ -319,7 +318,7 @@
                             </a>
                         </div>
                         <div class="soc-item">
-                            <a href="index.html" target="_blank">
+                            <a href="index.php" target="_blank">
                                 <span class="mbr-iconfont mbr-iconfont-social socicon-youtube socicon"></span>
                             </a>
                         </div>
