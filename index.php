@@ -334,12 +334,14 @@
 </section>
 
     <?php
-    /*
+    
         //information for connecting to the database on the server
-        $user_name = "eoqfgn8xkbmn";
+        $user_name = "dbadmin";
         $password = "2B!luffy";
         $database = "database";
-        $server = "";
+        $server = "localhost";
+        //TODO find out what information is correct 
+        //(a2plcpnl0215.prod.iad2.secureserver.net? localhost?)
 
         $conn = mysqli_connect($server, $user_name, $password, $database);
 
@@ -360,8 +362,8 @@
           echo "0 results";
         }
     
-        //mysqli_close($conn);
-        */
+        mysqli_close($conn);
+        
     ?>
     
     <script src="scripts/databaseManipulator.js"></script>
