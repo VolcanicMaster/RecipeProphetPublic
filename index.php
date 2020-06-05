@@ -337,11 +337,10 @@
     
         //information for connecting to the database on the server
         $user_name = "dbadmin";
-        $password = "2B!luffy";
+        $password = "monkeydluffydb";
         $database = "database";
         $server = "localhost";
-        //TODO find out what information is correct 
-        //(a2plcpnl0215.prod.iad2.secureserver.net? localhost?)
+        //localhost because this operation is down on the server with the database
 
         $conn = mysqli_connect($server, $user_name, $password, $database);
 
