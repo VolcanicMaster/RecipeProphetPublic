@@ -137,11 +137,7 @@
         </div>
     </nav>
 </section>
-<?php
-    
-        include "scripts/dbConnect.php"
-        
-?>
+
 <section class="engine"></section><section class="cid-qTkA127IK8 mbr-fullscreen" id="header2-1">
 
     
@@ -165,7 +161,11 @@
         </a>
     </div>
 </section>
-
+<?php
+    
+        include "scripts/dbConnect.php"
+        
+?>
 <section class="mbr-section form1 cid-rXBVuCaPZB" id="ingredientForm">
 
     
@@ -337,11 +337,12 @@
     </div>
 </section>
 
-    <?php
-    
-        mysqli_close($conn);
-        
-    ?>
+<?php
+
+    $conn->close();
+    //mysqli_close($conn);
+
+?>
     
     
     
