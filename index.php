@@ -137,7 +137,11 @@
         </div>
     </nav>
 </section>
-
+<?php
+    
+        include "scripts/dbConnect.php"
+        
+?>
 <section class="engine"></section><section class="cid-qTkA127IK8 mbr-fullscreen" id="header2-1">
 
     
@@ -335,35 +339,11 @@
 
     <?php
     
-        //information for connecting to the database on the server
-        $user_name = "dbadmin";
-        $password = "monkeydluffydb";
-        $database = "database";
-        $server = "localhost";
-        //localhost because this operation is down on the server with the database
-
-        $conn = mysqli_connect($server, $user_name, $password, $database);
-
-        //print displays the text on the page
-        print "Connection to the Server opened";
-    
-        echo $conn->host_info . "<br>";
-        
-        $sql = "SELECT id, link, name FROM recipes";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-          // output data of each row
-          while($row = $result->fetch_assoc()) {
-            echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
-          }
-        } else {
-          echo "0 results";
-        }
-    
         mysqli_close($conn);
         
     ?>
+    
+    
     
     <script src="scripts/databaseManipulator.js"></script>
     <script>
