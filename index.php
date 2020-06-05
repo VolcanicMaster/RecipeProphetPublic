@@ -333,6 +333,37 @@
     </div>
 </section>
 
+    <?php
+    /*
+        //information for connecting to the database on the server
+        $user_name = "eoqfgn8xkbmn";
+        $password = "2B!luffy";
+        $database = "database";
+        $server = "";
+
+        $conn = mysqli_connect($server, $user_name, $password, $database);
+
+        //print displays the text on the page
+        print "Connection to the Server opened";
+    
+        echo $conn->host_info . "<br>";
+        
+        $sql = "SELECT id, link, name FROM recipes";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+          // output data of each row
+          while($row = $result->fetch_assoc()) {
+            echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
+          }
+        } else {
+          echo "0 results";
+        }
+    
+        //mysqli_close($conn);
+        */
+    ?>
+    
     <script src="scripts/databaseManipulator.js"></script>
     <script>
                 document.onclick = function(e){
@@ -360,19 +391,6 @@
   <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
   <script src="assets/theme/js/script.js"></script>
   <!--<script src="https://cdn.jsdelivr.net/npm/fuse.js@5.2.3"></script>-->
-  
-    <?php
-        $user_name = "eoqfgn8xkbmn";
-        $password = "2B!luffy";
-        $database = "database";
-        $server = "127.0.0.1";
-
-        $link = mysqli_connect($server, $user_name, $password, $database);
-
-        //print displays the text on the page
-        print "Connection to the Server opened";
-        //mysqli_close($link);
-    ?>
   
 </body>
 </html>
