@@ -104,21 +104,6 @@
         /*while (recipeGallery.firstChild) {
               recipeGallery.removeChild(recipeGallery.firstChild);
             }*/
-
-        <?php
-            $sql = "SELECT id, link, name FROM recipes";
-            $result = $conn->query($sql);
-
-            /*if ($result->num_rows > 0) {
-                // output data of each row
-                while($row = $result->fetch_assoc()) {
-                //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
-                }
-            } else {
-                //echo "0 results";
-            }*/
-        ?>
-        var encodedQueryResult = <?php echo json_encode($result) ?>;
         
         var listOfIngredients = [];
         setUpDatabase.onsuccess = function()
@@ -147,8 +132,46 @@
         //TODO3 searchForRecipes that returns a sorted list of recipes
         //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
         //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
-
+        <?php
+            $sql = "SELECT id, link, name, tags FROM recipes";
+        ?>
+        
+        <?php
+            $result = $conn->query($sql);
+            $resultArray = array();
+        
+            if ($result->num_rows > 0) {
+                // output data of each row
+                while($row = $result->fetch_assoc()) {
+                    $rowArray = array();
+                    $rowArray[] = $row["id"];
+                    $rowArray[] = $row["link"];
+                    $rowArray[] = $row["name"];
+                    $rowArray[] = $row["tags"];
+                    //$rowArray[] = $row["imglink"];
+                    $resultArray[] = $rowArray;
+                //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
+                }
+            } else {
+                //echo "0 results";
+            }
+        ?>
+        //TODO1 check and fix encodedQueryResult
+        var encodedQueryResult = <?php echo json_encode($resultArray) ?>;
+        
         //TODO3.3 compile a string for the tags
+        
+        //TODOeventually combine the two for loops (directly from encodedQueryResult, no need for listOfRecipes)
+        var i;
+        for(i = 0; i < encodedQueryResult.length; i++){
+            var queryRecipeArray = encodedQueryResult[i];
+            var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
+            recipeArray[0] = queryRecipeArray[2];//recipe name
+            recipeArray[1] = queryRecipeArray[1];//recipe link
+            //recipeArray[2] = queryRecipeArray[4];//recipe image //TODO add image col to db
+            recipeArray[3] = queryRecipeArray[3];//recipe tags
+            listOfRecipes.push(recipeArray);
+        }
 
         //displayRecipes that empties and fills the recipeGallery with that list of recipes
 
