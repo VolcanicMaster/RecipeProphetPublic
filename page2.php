@@ -135,7 +135,8 @@
         <?php
             $sql = "SELECT id, link, name, tags FROM recipes";
         ?>
-        
+        //TODO1 test interactions between javascript and PHP.
+        // we need php to gain access to the indexeddb contents
         <?php
             $result = $conn->query($sql);
             $resultArray = array();
@@ -156,7 +157,6 @@
                 //echo "0 results";
             }
         ?>
-        //TODO1 check and fix encodedQueryResult
         var encodedQueryResult = <?php echo json_encode($resultArray) ?>;
         
         //TODO3.3 compile a string for the tags
