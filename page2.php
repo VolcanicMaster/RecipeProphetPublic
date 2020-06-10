@@ -128,7 +128,7 @@
 
         //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
         //var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
-        var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
+        var listOfRecipes = [];
         //TODO3 searchForRecipes that returns a sorted list of recipes
         //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
         //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
@@ -149,7 +149,7 @@
                     $rowArray[] = $row["link"];
                     $rowArray[] = $row["name"];
                     $rowArray[] = $row["tags"];
-                    //$rowArray[] = $row["imglink"];
+                    $rowArray[] = $row["imglink"];
                     $resultArray[] = $rowArray;
                 //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
                 }
@@ -159,7 +159,7 @@
         ?>
         var encodedQueryResult = <?php echo json_encode($resultArray) ?>;
         
-        //TODO3.3 compile a string for the tags
+        //TODOeventually compile a string for the tags when we have to enter the recipes into the db automatically
         
         //TODOeventually combine the two for loops (directly from encodedQueryResult, no need for listOfRecipes)
         var i;
@@ -168,7 +168,7 @@
             var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
             recipeArray[0] = queryRecipeArray[2];//recipe name
             recipeArray[1] = queryRecipeArray[1];//recipe link
-            //recipeArray[2] = queryRecipeArray[4];//recipe image //TODO add image col to db
+            recipeArray[2] = queryRecipeArray[4];//recipe image link
             recipeArray[3] = queryRecipeArray[3];//recipe tags
             listOfRecipes.push(recipeArray);
         }
