@@ -122,7 +122,7 @@
             }
         }
 
-        //TODO make sure recipeDatabase is open at this point
+        //recipeDatabase is open at this point
         //
         //
 
@@ -132,10 +132,31 @@
         //TODO3 searchForRecipes that returns a sorted list of recipes
         //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
         //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
+        
+        //TODO edit this function to send IndexedDB data and respond by calling a function that displays the results
+        function showUser(str) {
+          if (str == "") {
+            document.getElementById("txtHint").innerHTML = "";
+            return;
+          } else {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+              if (this.readyState == 4 && this.status == 200) {
+                  //TODO call function that displays results here
+                document.getElementById("txtHint").innerHTML = this.responseText;
+              }
+            };
+            xmlhttp.open("GET","getuser.php?q="+str,true);
+            xmlhttp.send();
+          }
+        }
+
+        //TODO send IndexedDB data from JS to PHP using an XMLHttpRequest, and onreadystatechange, responds to JS
+        
         <?php
             $sql = "SELECT id, link, name, tags FROM recipes";
         ?>
-        //TODO1 test interactions between javascript and PHP.
+        
         // we need php to gain access to the indexeddb contents
         <?php
             $result = $conn->query($sql);
