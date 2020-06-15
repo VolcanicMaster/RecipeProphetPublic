@@ -142,11 +142,12 @@
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function() {
               if (this.readyState == 4 && this.status == 200) {
-                  //TODO call function that displays results here
+                  //TODO displays results here
+                  //TODO instead, do display results code in searchRecipes.php, then put the responseText in the gallery
                 document.getElementById("txtHint").innerHTML = this.responseText;
               }
             };
-            xmlhttp.open("GET","getuser.php?q="+str,true);
+            xmlhttp.open("GET","searchRecipes.php?q="+str,true);
             xmlhttp.send();
           }
         }
