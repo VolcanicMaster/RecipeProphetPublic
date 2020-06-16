@@ -9,7 +9,7 @@
   <meta name="description" content="Website Creator Description">
   
   
-  <title>Display Recipes</title>
+  <title id=title>Display Recipes</title>
   <link rel="stylesheet" href="assets/web/assets/mobirise-icons/mobirise-icons.css">
   <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
@@ -56,7 +56,7 @@
                          <img src="assets/images/mbr-122x158.png" alt="Mobirise" title="" style="height: 3.8rem;">
                     </a>
                 </span>
-                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="index.php">
+                <span class="navbar-caption-wrap"><a id=recipeProphetHomeButton class="navbar-caption text-white display-4" href="index.php">
                         Recipe Prophet</a></span>
             </div>
         </div>
@@ -133,29 +133,26 @@
         //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
         //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
         
-        //TODO edit this function to send IndexedDB data and respond by calling a function that displays the results
-        function showUser(str) {
-          if (str == "") {
-            document.getElementById("txtHint").innerHTML = "";
-            return;
-          } else {
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                  //TODO displays results here
-                  //TODO instead, do display results code in searchRecipes.php, then put the responseText in the gallery
-                document.getElementById("txtHint").innerHTML = this.responseText;
-              }
-            };
-            xmlhttp.open("GET","searchRecipes.php?q="+str,true);
-            xmlhttp.send();
-          }
-        }
+        
 
+        var a = [1,2,3],
+            xmlhttp = new XMLHttpRequest;
+
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                //TODO do display results code in searchRecipes.php, then put the responseText in the gallery
+                  document.getElementById("").innerHTML = this.responseText;
+              }
+        }
+        
+        xmlhttp.open( "POST", "scripts/searchRecipes.php" );
+        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+        xmlhttp.send( '[1,2,3]' );
+        
         //TODO send IndexedDB data from JS to PHP using an XMLHttpRequest, and onreadystatechange, responds to JS
         
         <?php
-            $sql = "SELECT id, link, name, tags FROM recipes";
+            $sql = "SELECT id, link, name, tags, imglink FROM recipes";
         ?>
         
         // we need php to gain access to the indexeddb contents
@@ -209,7 +206,7 @@
             const galleryItem = document.createElement('div');
             galleryItem.className = "mbr-gallery-item mbr-gallery-item--p1";
             galleryItem.setAttribute("data-video-url","false");
-            galleryItem.setAttribute("data-tags",recipe[3]); // tags
+            galleryItem.setAttribute("data-tags",recipe[3].substring(1,recipe[3].length - 2)); // tags
             onclickAttribute = "location.href='" + recipe[1] + "'";
             galleryItem.setAttribute("onclick",onclickAttribute); // link to recipe
 
