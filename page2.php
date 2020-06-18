@@ -141,13 +141,13 @@
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 //TODO do display results code in searchRecipes.php, then put the responseText in the gallery
-                  document.getElementById("").innerHTML = this.responseText;
+                  document.getElementById("recipeProphetHomeButton").innerHTML = this.responseText;
               }
         }
         
         xmlhttp.open( "POST", "scripts/searchRecipes.php" );
         xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-        xmlhttp.send( '[1,2,3]' );
+        xmlhttp.send( JSON.stringify(a) );
         
         //TODO send IndexedDB data from JS to PHP using an XMLHttpRequest, and onreadystatechange, responds to JS
         
@@ -206,7 +206,8 @@
             const galleryItem = document.createElement('div');
             galleryItem.className = "mbr-gallery-item mbr-gallery-item--p1";
             galleryItem.setAttribute("data-video-url","false");
-            galleryItem.setAttribute("data-tags",recipe[3].substring(1,recipe[3].length - 2)); // tags
+            //substring removes quote in tags
+            galleryItem.setAttribute("data-tags",recipe[3].substring(1,recipe[3].length - 1)); // tags
             onclickAttribute = "location.href='" + recipe[1] + "'";
             galleryItem.setAttribute("onclick",onclickAttribute); // link to recipe
 
