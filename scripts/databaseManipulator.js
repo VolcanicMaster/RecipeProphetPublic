@@ -24,7 +24,23 @@ const list = document.getElementById('ingredients');
 //const submitBtn = document.getElementById('easyFilterButton');
 
 // Create an instance of a db object for us to store the open database in
-let db;
+db = [];
+
+setUpCompleted = {
+  aInternal: false,
+  aListener: function(val) {},
+  set a(val) {
+    this.aInternal = val;
+    this.aListener(val);
+  },
+  get a() {
+    return this.aInternal;
+  },
+  registerListener: function(listener) {
+    this.aListener = listener;
+  }
+}
+
 
 // Define the addData() function
   function addData(ingredient) {
@@ -176,6 +192,9 @@ function setUpDatabase() {
 
     // Run the displayData() function to display the notes already in the IDB
     displayData();
+      
+    // send a message to other javascript that setUpDatabase is completed
+    setUpCompleted.a = true;
   };
 
   // Setup the database tables if this has not already been done
@@ -250,5 +269,6 @@ function setUpDatabase() {
   */
 
 };
+
 
 window.onload = setUpDatabase;

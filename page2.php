@@ -106,26 +106,48 @@
             }*/
         
         var listOfIngredients = [];
-        setUpDatabase.onsuccess = function()
-        {
+        
+        function getListOfIngredientsAndSendToSearchRecipes(listOfIngredients){
+            console.log("entered getLOIEtc");
             let objectStore = db.transaction('notes_os').objectStore('notes_os');
             objectStore.openCursor().onsuccess = function(e) {
+                console.log("entered objectStore.openCursor().onsuccess");
                 // Get a reference to the cursor
                 let cursor = e.target.result;
 
                 // If there is still another data item to iterate through, keep running this code
                 if(cursor) {
+                    console.log("entered if cursor");
                     //add this ingredient to an easily accessible array
                     listOfIngredients.push(cursor.value.name);
                     cursor.continue();
+                } else {
+                    console.log("entered else cursor");
+                    var xmlhttp = new XMLHttpRequest;
+
+                    xmlhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            //TODO do display results code in searchRecipes.php, then put the responseText in the gallery
+                              document.getElementById("recipeProphetHomeButton").innerHTML = this.responseText;
+                          }
+                    }
+
+                    xmlhttp.open( "POST", "scripts/searchRecipes.php" );
+                    xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+                    xmlhttp.send( JSON.stringify(listOfIngredients) );
+                    return listOfIngredients;
                 }
             }
         }
+        
+        //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
+        setUpCompleted.registerListener(function(val) {
+            console.log("Someone changed the value of setUpCompleted.a to " + val);
+            listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
+        });
 
-        //recipeDatabase is open at this point
-        //
-        //
-
+        setUpDatabase();
+        
         //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
         //var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
         var listOfRecipes = [];
@@ -135,21 +157,12 @@
         
         
 
-        var a = [1,2,3],
-            xmlhttp = new XMLHttpRequest;
-
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                //TODO do display results code in searchRecipes.php, then put the responseText in the gallery
-                  document.getElementById("recipeProphetHomeButton").innerHTML = this.responseText;
-              }
-        }
         
-        xmlhttp.open( "POST", "scripts/searchRecipes.php" );
-        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-        xmlhttp.send( JSON.stringify(a) );
         
         //TODO send IndexedDB data from JS to PHP using an XMLHttpRequest, and onreadystatechange, responds to JS
+        //TODO listOfIngredients is not updated when this code runs, we need to only run this code when it is
+        //TODO put most/all code in async function that is called (or use IIFE) and use await's?
+        //TODO OR write promises?
         
         <?php
             $sql = "SELECT id, link, name, tags, imglink FROM recipes";
