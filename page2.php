@@ -128,11 +128,15 @@
                     xmlhttp.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             //TODO do display results code in searchRecipes.php, then put the responseText in the gallery
-                              document.getElementById("recipeProphetHomeButton").innerHTML = this.responseText;
+                            console.log("entered onreadystatechange");
+                            let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+                            let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
+                            recipeGallery.parentNode.replaceChild(newRecipeGallery, recipeGallery);
+                            console.log("ended onreadystatechange");
                           }
                     }
 
-                    xmlhttp.open( "POST", "scripts/searchRecipes.php" );
+                    xmlhttp.open( "POST", "searchRecipes.php" );
                     xmlhttp.setRequestHeader( "Content-Type", "application/json" );
                     xmlhttp.send( JSON.stringify(listOfIngredients) );
                     return listOfIngredients;
@@ -142,105 +146,20 @@
         
         //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
         setUpCompleted.registerListener(function(val) {
-            console.log("Someone changed the value of setUpCompleted.a to " + val);
-            listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
+            console.log("Changed the value of setUpCompleted.a to " + val);
+            if(val == true){
+                listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
+                //Ensure that setUpCompleted is set back to false right after the functions finish
+                setUpCompleted.a = false;
+            }
         });
 
         setUpDatabase();
         
-        //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
-        //var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
-        var listOfRecipes = [];
-        //TODO3 searchForRecipes that returns a sorted list of recipes
-        //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
-        //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
         
         
-
+        //TODO Put search code in searchRecipes.php so it has access to the IndexedDB info
         
-        
-        //TODO send IndexedDB data from JS to PHP using an XMLHttpRequest, and onreadystatechange, responds to JS
-        //TODO listOfIngredients is not updated when this code runs, we need to only run this code when it is
-        //TODO put most/all code in async function that is called (or use IIFE) and use await's?
-        //TODO OR write promises?
-        
-        <?php
-            $sql = "SELECT id, link, name, tags, imglink FROM recipes";
-        ?>
-        
-        // we need php to gain access to the indexeddb contents
-        <?php
-            $result = $conn->query($sql);
-            $resultArray = array();
-        
-            if ($result->num_rows > 0) {
-                // output data of each row
-                while($row = $result->fetch_assoc()) {
-                    $rowArray = array();
-                    $rowArray[] = $row["id"];
-                    $rowArray[] = $row["link"];
-                    $rowArray[] = $row["name"];
-                    $rowArray[] = $row["tags"];
-                    $rowArray[] = $row["imglink"];
-                    $resultArray[] = $rowArray;
-                //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
-                }
-            } else {
-                //echo "0 results";
-            }
-        ?>
-        var encodedQueryResult = <?php echo json_encode($resultArray) ?>;
-        
-        //TODOeventually compile a string for the tags when we have to enter the recipes into the db automatically
-        
-        //TODOeventually combine the two for loops (directly from encodedQueryResult, no need for listOfRecipes)
-        var i;
-        for(i = 0; i < encodedQueryResult.length; i++){
-            var queryRecipeArray = encodedQueryResult[i];
-            var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
-            recipeArray[0] = queryRecipeArray[2];//recipe name
-            recipeArray[1] = queryRecipeArray[1];//recipe link
-            recipeArray[2] = queryRecipeArray[4];//recipe image link
-            recipeArray[3] = queryRecipeArray[3];//recipe tags
-            listOfRecipes.push(recipeArray);
-        }
-
-        //displayRecipes that empties and fills the recipeGallery with that list of recipes
-
-        var i;
-        for(i = 0; i < listOfRecipes.length; i++)
-        {
-            recipe = listOfRecipes[i];
-
-            //create and add a new html element to recipeGallery
-            /*
-            <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
-            */
-            const galleryItem = document.createElement('div');
-            galleryItem.className = "mbr-gallery-item mbr-gallery-item--p1";
-            galleryItem.setAttribute("data-video-url","false");
-            //substring removes quote in tags
-            galleryItem.setAttribute("data-tags",recipe[3].substring(1,recipe[3].length - 1)); // tags
-            onclickAttribute = "location.href='" + recipe[1] + "'";
-            galleryItem.setAttribute("onclick",onclickAttribute); // link to recipe
-
-            const galleryContent = document.createElement('div');
-            const galleryImage = document.createElement('img');
-            galleryImage.setAttribute("src",recipe[2]); // image
-            galleryImage.setAttribute("alt","");
-            galleryImage.setAttribute("title","");
-            const gallerySpanFocus = document.createElement('span');
-            gallerySpanFocus.className="icon-focus";
-            const gallerySpanTitle = document.createElement('span');
-            gallerySpanTitle.className = "mbr-gallery-title mbr-fonts-style display-7";
-            gallerySpanTitle.textContent = recipe[0]; // name
-
-            galleryContent.appendChild(galleryImage);
-            galleryContent.appendChild(gallerySpanFocus);
-            galleryContent.appendChild(gallerySpanTitle);
-            galleryItem.appendChild(galleryContent);
-            recipeGallery.appendChild(galleryItem);
-        }
     </script>
     
     <?php
