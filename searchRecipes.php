@@ -33,7 +33,7 @@
   
 </head>
 <body>
-    <div id="newRecipeProphetRecipeGallery"></div>
+    <!--<div id="newRecipeProphetRecipeGallery"></div>-->
 </body>
 
 <?php
@@ -45,6 +45,75 @@ $data = file_get_contents( "php://input" ); //$data is now the string '[1,2,3]';
 
 $data = json_decode( $data ); //$data is now a php array array(1,2,3)
 
+/*
+// Create a new DOM Document 
+$dom = new DomDocument;
+//$dom = new DOMDocument('1.0', 'iso-8859-1'); 
+
+// Validate our document before referring to the id
+$dom->validateOnParse = true;
+
+// Create a div element 
+$element = $dom->appendChild(new DOMElement('div')); 
+  
+// Create a id attribute to div 
+$attr = $element->setAttributeNode( 
+        new DOMAttr('id', 'my_id')); 
+  
+// Set that attribute as id 
+$element->setIDAttribute('id', true); 
+
+$id = $dom->getElementById('my_id');*/
+
+echo '<div id="newRecipeProphetRecipeGallery">';
+
+//TODO use echos within a loop to generate the gallery?
+
+//TODO3 searchForRecipes that returns a sorted list of recipes
+//TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
+//TODO3.2 if we can use a query to do the filter we want on ingredients, do that
+
+$sql = "SELECT id, link, name, tags, imglink FROM recipes";
+
+// we need php to gain access to the indexeddb contents
+$result = $conn->query($sql);
+$resultArray = array();
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        $rowArray = array();
+        //$rowArray[] = $row["id"];
+        $rowArray[] = $row["name"];
+        $rowArray[] = $row["link"];
+        $rowArray[] = $row["imglink"];
+        $rowArray[] = $row["tags"];
+        $resultArray[] = $rowArray;
+        
+        //TODO echo from within this loop, then if it works delete the unnecessary vars
+        /*
+        <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
+        */
+        //TODO do the tags need extra quotes?
+        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="' 
+            . $row["tags"] 
+            . '" onclick="location.href="' . $row["link"] . '">';
+        echo '<div>';
+        echo '<img src="' . $row["imglink"] . '" alt="" title="">';
+        echo '<span class="icon-focus"></span>';
+        echo '<span class="mbr-gallery-title mbr-fonts-style display-7">' . $row["name"] . '</span>';
+        echo '</div>';
+        
+        echo '</div>';
+        
+    //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
+    }
+} else {
+    //echo "0 results";
+}
+
+echo '</div>';
+
 ?>
 <script>
     //Do logs work on pages that aren't in the front?
@@ -53,6 +122,8 @@ $data = json_decode( $data ); //$data is now a php array array(1,2,3)
     //TODO figure out why database recipes aren't showing? Gallery is being replaced, but EITHER
     //  1. the code isn't running? (we know php code runs because we tested the array before) OR
     //  2. the database isn't being accessed correctly, returning an empty list
+    
+    //TODO JS code doesn't appear to be running: RECREATE THIS IN PHP
     
     const newRecipeGallery = document.getElementById('newRecipeProphetRecipeGallery');
 
@@ -64,6 +135,11 @@ $data = json_decode( $data ); //$data is now a php array array(1,2,3)
     //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
     //var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
     var listOfRecipes = [];
+    
+    //Testing if JS code runs
+    var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
+    listOfRecipes.push(recipeArray);
+    
     //TODO3 searchForRecipes that returns a sorted list of recipes
     //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
     //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
