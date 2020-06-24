@@ -95,9 +95,9 @@ if ($result->num_rows > 0) {
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
         */
         //TODO do the tags need extra quotes?
-        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="' 
+        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
             . $row["tags"] 
-            . '" onclick="location.href="' . $row["link"] . '">';
+            . ' onclick="location.href=\'' . $row["link"] . '\'">';
         echo '<div>';
         echo '<img src="' . $row["imglink"] . '" alt="" title="">';
         echo '<span class="icon-focus"></span>';
