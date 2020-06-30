@@ -10,10 +10,7 @@ function testRun(){
     document.getElementById("ingredients").appendChild(node);
 }
 
-//TODO add database editing
-
 //Edited version of index.js from IndexedDBTutorial that uses ingredient database
-//TODO instead of adding to the database, change a value
 
 //TODO refactor to proper constraints
 // Create needed constants
@@ -49,20 +46,13 @@ setUpCompleted = {
     console.log("Begin call to addData");
 
     // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-    let newItem = { name: ingredient }; //TODO list.lastChild.firstChild.textContent?
-      //TODO create global variable instead of text on the screen?
+    let newItem = { name: ingredient }; //previously list.lastChild.firstChild.textContent?
 
     // open a read/write db transaction, ready for adding the data
     let transaction = db.transaction(['notes_os'], 'readwrite');
 
     // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore('notes_os');
-
-      
-    //TODO check if name is already in db?
-      // OR make (hashed) name the id?
-    
-      
+    let objectStore = transaction.objectStore('notes_os'); 
       
     // Make a request to add our newItem object to the object store
     var request = objectStore.add(newItem);

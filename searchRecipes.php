@@ -67,34 +67,48 @@ $id = $dom->getElementById('my_id');*/
 
 echo '<div id="newRecipeProphetRecipeGallery">';
 
-//TODO use echos within a loop to generate the gallery?
+//use echos within a loop to generate the gallery
 
 //TODO3 searchForRecipes that returns a sorted list of recipes
 //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
 
-$sql = "SELECT id, link, name, tags, imglink FROM recipes";
+//$sql = "SELECT id, link, name, tags, imglink FROM recipes";
 
-// we need php to gain access to the indexeddb contents
+// selects distinct recipes with 'ingredients' being concatenated ingredients (with delim ',')
+$sql = "SELECT r.id AS 'id', r.link AS 'link', r.name AS 'name', r.tags AS 'tags', r.imglink AS 'imglink'
+FROM recipes r
+WHERE r.id IN
+(SELECT DISTINCT ri1.recipe_id
+FROM recipeIngredients ri1
+   --
+   -- There should not exist a product
+   -- that is not part of our order.
+   --
+WHERE NOT EXISTS (
+        SELECT *
+        FROM ingredients ing
+        WHERE 1=1
+           -- extra clause: only want producs from a literal list
+        AND ing.id IN (7,14)
+           --  ... that is not part of our order...
+        AND NOT EXISTS ( SELECT *
+                FROM recipeIngredients ri2
+                WHERE ri2.ingredient_id = ing.id
+                AND ri2.recipe_id = ri1.recipe_id
+                )
+        )
+)";
+//TODO  Make a query that selects recipes which only contain ingredients from the constraint list?
+
 $result = $conn->query($sql);
-$resultArray = array();
 
 if ($result->num_rows > 0) {
     // output data of each row
-    while($row = $result->fetch_assoc()) {
-        $rowArray = array();
-        //$rowArray[] = $row["id"];
-        $rowArray[] = $row["name"];
-        $rowArray[] = $row["link"];
-        $rowArray[] = $row["imglink"];
-        $rowArray[] = $row["tags"];
-        $resultArray[] = $rowArray;
-        
-        //TODO echo from within this loop, then if it works delete the unnecessary vars
+    while($row = $result->fetch_assoc()) {        
         /*
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
         */
-        //TODO do the tags need extra quotes?
         echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
             . $row["tags"] 
             . ' onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
@@ -115,113 +129,6 @@ if ($result->num_rows > 0) {
 echo '</div>';
 
 ?>
-<script>
-    //Do logs work on pages that aren't in the front?
-    console.log("log from searchRecipes.php");
-    
-    //TODO figure out why database recipes aren't showing? Gallery is being replaced, but EITHER
-    //  1. the code isn't running? (we know php code runs because we tested the array before) OR
-    //  2. the database isn't being accessed correctly, returning an empty list
-    
-    //TODO JS code doesn't appear to be running: RECREATE THIS IN PHP
-    
-    const newRecipeGallery = document.getElementById('newRecipeProphetRecipeGallery');
-
-        //remove all existing children from recipeGallery
-        /*while (recipeGallery.firstChild) {
-              recipeGallery.removeChild(recipeGallery.firstChild);
-            }*/
-    
-    //var listOfRecipes = [["testName","testLink","testImage","testTags"]];
-    //var listOfRecipes = [["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"]];
-    var listOfRecipes = [];
-    
-    //Testing if JS code runs
-    var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
-    listOfRecipes.push(recipeArray);
-    
-    //TODO3 searchForRecipes that returns a sorted list of recipes
-    //TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
-    //TODO3.2 if we can use a query to do the filter we want on ingredients, do that
-
-    <?php
-        $sql = "SELECT id, link, name, tags, imglink FROM recipes";
-    ?>
-
-    // we need php to gain access to the indexeddb contents
-    <?php
-        $result = $conn->query($sql);
-        $resultArray = array();
-
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $rowArray = array();
-                $rowArray[] = $row["id"];
-                $rowArray[] = $row["link"];
-                $rowArray[] = $row["name"];
-                $rowArray[] = $row["tags"];
-                $rowArray[] = $row["imglink"];
-                $resultArray[] = $rowArray;
-            //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
-            }
-        } else {
-            //echo "0 results";
-        }
-    ?>
-    var encodedQueryResult = <?php echo json_encode($resultArray) ?>;
-
-    //TODOeventually compile a string for the tags when we have to enter the recipes into the db automatically
-
-    //TODOeventually combine the two for loops (directly from encodedQueryResult, no need for listOfRecipes)
-    var i;
-    for(i = 0; i < encodedQueryResult.length; i++){
-        var queryRecipeArray = encodedQueryResult[i];
-        var recipeArray = ["Caprese Salad","index.html","assets/images/mbr-10-1920x1280-800x533.jpg","Salad, Easy, Light"];
-        recipeArray[0] = queryRecipeArray[2];//recipe name
-        recipeArray[1] = queryRecipeArray[1];//recipe link
-        recipeArray[2] = queryRecipeArray[4];//recipe image link
-        recipeArray[3] = queryRecipeArray[3];//recipe tags
-        listOfRecipes.push(recipeArray);
-    }
-
-    //displayRecipes that empties and fills the recipeGallery with that list of recipes
-
-    var i;
-    for(i = 0; i < listOfRecipes.length; i++)
-    {
-        recipe = listOfRecipes[i];
-
-        //create and add a new html element to recipeGallery
-        /*
-        <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
-        */
-        const galleryItem = document.createElement('div');
-        galleryItem.className = "mbr-gallery-item mbr-gallery-item--p1";
-        galleryItem.setAttribute("data-video-url","false");
-        //substring removes quote in tags
-        galleryItem.setAttribute("data-tags",recipe[3].substring(1,recipe[3].length - 1)); // tags
-        onclickAttribute = "location.href='" + recipe[1] + "'";
-        galleryItem.setAttribute("onclick",onclickAttribute); // link to recipe
-
-        const galleryContent = document.createElement('div');
-        const galleryImage = document.createElement('img');
-        galleryImage.setAttribute("src",recipe[2]); // image
-        galleryImage.setAttribute("alt","");
-        galleryImage.setAttribute("title","");
-        const gallerySpanFocus = document.createElement('span');
-        gallerySpanFocus.className="icon-focus";
-        const gallerySpanTitle = document.createElement('span');
-        gallerySpanTitle.className = "mbr-gallery-title mbr-fonts-style display-7";
-        gallerySpanTitle.textContent = recipe[0]; // name
-
-        galleryContent.appendChild(galleryImage);
-        galleryContent.appendChild(gallerySpanFocus);
-        galleryContent.appendChild(gallerySpanTitle);
-        galleryItem.appendChild(galleryContent);
-        newRecipeGallery.appendChild(galleryItem);
-    }
-</script>
 
 <script src="assets/web/assets/jquery/jquery.min.js"></script>
   <script src="assets/popper/popper.min.js"></script>
@@ -239,12 +146,6 @@ echo '</div>';
   <script src="assets/gallery/player.min.js"></script>
   <script src="assets/gallery/script.js"></script>
   <script src="assets/slidervideo/script.js"></script>
-
-<?php
-
-//echo '<pre>'; print_r($data); echo '</pre>';
-
-?>
 
 <?php
     $conn->close();
