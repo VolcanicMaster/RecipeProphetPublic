@@ -69,29 +69,26 @@ echo '<div id="newRecipeProphetRecipeGallery">';
 
 //use echos within a loop to generate the gallery
 
-//TODO3 searchForRecipes that returns a sorted list of recipes
-//TODO3.1 query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
-//TODO3.2 if we can use a query to do the filter we want on ingredients, do that
+//TODO searchForRecipes that returns a sorted list of recipes
+//TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
-//$sql = "SELECT id, link, name, tags, imglink FROM recipes";
-
-// selects distinct recipes with 'ingredients' being concatenated ingredients (with delim ',')
+// Query that selects recipes which only contain ingredients from the constraint list
 $sql = "SELECT r.id AS 'id', r.link AS 'link', r.name AS 'name', r.tags AS 'tags', r.imglink AS 'imglink'
 FROM recipes r
 WHERE r.id IN
 (SELECT DISTINCT ri1.recipe_id
 FROM recipeIngredients ri1
    --
-   -- There should not exist a product
-   -- that is not part of our order.
+   -- There should not exist an ingredient
+   -- that is not part of our recipeIngredient.
    --
 WHERE NOT EXISTS (
         SELECT *
         FROM ingredients ing
         WHERE 1=1
-           -- extra clause: only want producs from a literal list
+           -- extra clause: only want ingredients from a literal list
         AND ing.id IN (7,14)
-           --  ... that is not part of our order...
+           --  ... that is not part of our recipeIngredient...
         AND NOT EXISTS ( SELECT *
                 FROM recipeIngredients ri2
                 WHERE ri2.ingredient_id = ing.id
@@ -99,7 +96,6 @@ WHERE NOT EXISTS (
                 )
         )
 )";
-//TODO  Make a query that selects recipes which only contain ingredients from the constraint list?
 
 $result = $conn->query($sql);
 
