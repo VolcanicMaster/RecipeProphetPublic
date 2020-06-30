@@ -1,37 +1,3 @@
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="generator" content="Mobirise v4.12.3, mobirise.com">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-  <link rel="shortcut icon" href="assets/images/mbr-122x158.png" type="image/x-icon">
-  <meta name="description" content="Website Creator Description">
-  
-  <title id=title>Searching for Recipes...</title>
-  <link rel="stylesheet" href="assets/web/assets/mobirise-icons/mobirise-icons.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
-  <link rel="stylesheet" href="assets/dropdown/css/style.css">
-  <link rel="stylesheet" href="assets/tether/tether.min.css">
-  <link rel="stylesheet" href="assets/theme/css/style.css">
-  <link rel="stylesheet" href="assets/gallery/style.css">
-  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
-    
-    <style>
-        #ingredientsSection {
-            overflow:hidden;
-            float:left;
-            width: 220px;
-        }
-        #gallery1-8 {
-           float: left;
-        }
-        #ingredients {
-            margin-top: 100px;
-        }
-    </style>
-  
-</head>
 <body>
     <!--<div id="newRecipeProphetRecipeGallery"></div>-->
 </body>
@@ -44,6 +10,8 @@
 $data = file_get_contents( "php://input" ); //$data is now the string '[1,2,3]';
 
 $data = json_decode( $data ); //$data is now a php array array(1,2,3)
+
+$imploded_data = implode( "', '", $data);
 
 /*
 // Create a new DOM Document 
@@ -87,7 +55,7 @@ WHERE NOT EXISTS (
         FROM ingredients ing
         WHERE 1=1
            -- extra clause: only want ingredients from a literal list
-        AND ing.id IN (7,14)
+        AND ing.name IN ( '" . $imploded_data . "' ) 
            --  ... that is not part of our recipeIngredient...
         AND NOT EXISTS ( SELECT *
                 FROM recipeIngredients ri2
@@ -108,7 +76,7 @@ if ($result->num_rows > 0) {
         echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
             . $row["tags"] 
             . ' onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
-        echo '<div>';
+        echo '<div class="crop">';
         echo '<img src="' . $row["imglink"] . '" alt="" title="">';
         echo '<span class="icon-focus"></span>';
         echo '<span class="mbr-gallery-title mbr-fonts-style display-7">' . $row["name"] . '</span>';

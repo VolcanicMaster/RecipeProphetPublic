@@ -32,6 +32,21 @@
         #ingredients {
             margin-top: 100px;
         }
+        .crop {
+            width: 400px; /* 200 */
+            height: 225px; /* 150 */
+            overflow: hidden;
+        }
+        .crop img {
+            width: 400px;  /* 400 */
+            height: 225px; /* 300 */
+            /*margin: 0 0 0 0;*/
+        }
+        /*editing styling of existing class*/
+        .mbr-gallery-item {
+            margin-left: 100px;
+            margin-right: 100px;
+        }
     </style>
   
 </head>
