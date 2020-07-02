@@ -40,6 +40,7 @@
         .crop img {
             width: 400px;  /* 400 */
             height: 225px; /* 300 */
+            object-fit: cover;
             /*margin: 0 0 0 0;*/
         }
         /*editing styling of existing class*/

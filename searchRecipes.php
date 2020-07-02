@@ -35,19 +35,17 @@ $id = $dom->getElementById('my_id');*/
 
 echo '<div id="newRecipeProphetRecipeGallery">';
 
-//use echos within a loop to generate the gallery
-
 //TODO searchForRecipes that returns a sorted list of recipes
 //TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
 // Query that selects recipes which only contain ingredients from the constraint list
-// TODO change this so that it selects recipes which only contain ingredients from the constraint list
 $sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
 
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // output data of each row
+    //use echos within a loop to generate the gallery
     while($row = $result->fetch_assoc()) {        
         /*
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
