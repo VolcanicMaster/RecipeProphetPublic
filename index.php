@@ -192,7 +192,10 @@
                     <div class="dragArea row">
                         
                         
-                        
+                        <!-->   
+                                TODO generate ingredients list from database
+                                TODO limit number of elements shown to (10?)
+                        </-->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
                             <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','myDropdown')"></textarea>

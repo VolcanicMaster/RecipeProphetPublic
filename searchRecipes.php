@@ -41,29 +41,8 @@ echo '<div id="newRecipeProphetRecipeGallery">';
 //TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
 // Query that selects recipes which only contain ingredients from the constraint list
-$sql = "SELECT r.id AS 'id', r.link AS 'link', r.name AS 'name', r.tags AS 'tags', r.imglink AS 'imglink'
-FROM recipes r
-WHERE r.id IN
-(SELECT DISTINCT ri1.recipe_id
-FROM recipeIngredients ri1
-   --
-   -- There should not exist an ingredient
-   -- that is not part of our recipeIngredient.
-   --
-WHERE NOT EXISTS (
-        SELECT *
-        FROM ingredients ing
-        WHERE 1=1
-           -- extra clause: only want ingredients from a literal list
-        AND ing.name IN ( '" . $imploded_data . "' ) 
-           --  ... that is not part of our recipeIngredient...
-        AND NOT EXISTS ( SELECT *
-                FROM recipeIngredients ri2
-                WHERE ri2.ingredient_id = ing.id
-                AND ri2.recipe_id = ri1.recipe_id
-                )
-        )
-)";
+// TODO change this so that it selects recipes which only contain ingredients from the constraint list
+$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
 
 $result = $conn->query($sql);
 
