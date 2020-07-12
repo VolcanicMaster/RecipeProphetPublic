@@ -31,19 +31,25 @@ function filterFunction() {
 }*/
 
 function filterFunction(inputID,dropdownID) {
-  var input, filter, ul, li, p, i;
+  var input, filter, ul, li, p, i, count;
   input = document.getElementById(inputID);
   filter = input.value.toUpperCase();
   div = document.getElementById(dropdownID);
   p = div.getElementsByTagName("p");
+    count = 0;
 
   $(div).show();
   //div.classList.show();
 
   for (i = 0; i < p.length; i++) {
+      if(count > 10){
+            //limit number of elements shown
+            break;
+        }
     txtValue = p[i].textContent || p[i].innerText;
     if (txtValue.toUpperCase().indexOf(filter) > -1) {
       p[i].style.display = "";
+        count++;
     } else {
       p[i].style.display = "none";
     }

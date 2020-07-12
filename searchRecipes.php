@@ -67,6 +67,45 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
+
+
+//TODO get list of ingredients and insert that into our ingredients database for reference here
+//TODO use a fuzzy search with the ingredients database entries as inputs and 
+//      they'll be searching each ingredient for each recipe
+
+
+/*
+$ingredientsfile = file_get_contents("tempRecipeJSON/testIngredients.json");
+
+$ingredients = json_decode($ingredientsfile);
+
+foreach($ingredients as $row){
+    $sql = "INSERT INTO ingredients(name, pictureLink) VALUES ('".$row["name"]."', '".$row["photo_url"]."')";
+    mysqli_query($conn, $sql);
+}
+
+echo "<p>Ingredients Data Inserted</p>";
+
+*/
+
+//TODO put code here that reads test json file with 2 entries and submits it to the database
+//(will only be run once when the program is completed)
+
+
+$allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
+
+$allrecipesarray = json_decode($allrecipesfile);
+
+echo '<div>' . 'testing if divs work like this!' . '</div>';
+
+foreach($allrecipesarray as $row){
+    //$row["ingredients"];
+    echo '<div>' . $row["title"] . '</div>';
+    
+    $sql = "INSERT INTO ";
+    //$conn->query($sql);
+}
+
 echo '</div>';
 
 ?>

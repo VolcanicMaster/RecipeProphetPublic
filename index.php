@@ -192,21 +192,25 @@
                     <div class="dragArea row">
                         
                         
-                        <!-->   
-                                TODO generate ingredients list from database
-                                TODO limit number of elements shown to (10?)
-                        </-->
+                        <!-- 
+                                generates ingredients list from database, 
+                                filterFunction limits number of ingredients shown at once
+
+                                TODO include ingredients like Salt, Olive Oil, Extra Virgin Olive Oil by default
+                                    OR add a button that adds common ingredients
+                                TODO add RESET button that either clears or calls the "add default" function?
+                        -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
-                            <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','myDropdown')"></textarea>
+                            <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','ingredientDropdown')"></textarea>
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
-                              <div id="myDropdown" class="dropdown-content">
-                                <p id="lettuceSelection" onclick="selectElementFromTextArea('lettuceSelection','myDropdown','search')">Lettuce</p>
-                                <p id="appleSelection" onclick="selectElementFromTextArea('appleSelection','myDropdown','search')">Apple</p>
-                                <p id="mozzarellaSelection" onclick="selectElementFromTextArea('mozzarellaSelection','myDropdown','search')">Mozzarella Cheese</p>
-                                <p id="chickenSelection" onclick="selectElementFromTextArea('chickenSelection','myDropdown','search')">Chicken</p>
-                                <p id="pastaSelection" onclick="selectElementFromTextArea('pastaSelection','myDropdown','search')">Pasta / Noodles</p>
+                              <div id="ingredientDropdown" class="dropdown-content">
+                                <p id="lettuceSelection" onclick="selectElementFromTextArea('lettuceSelection','ingredientDropdown','search')">Lettuce</p>
+                                <p id="appleSelection" onclick="selectElementFromTextArea('appleSelection','ingredientDropdown','search')">Apple</p>
+                                <p id="mozzarellaSelection" onclick="selectElementFromTextArea('mozzarellaSelection','ingredientDropdown','search')">Mozzarella Cheese</p>
+                                <p id="chickenSelection" onclick="selectElementFromTextArea('chickenSelection','ingredientDropdown','search')">Chicken</p>
+                                <p id="pastaSelection" onclick="selectElementFromTextArea('pastaSelection','ingredientDropdown','search')">Pasta / Noodles</p>
                               </div>
                             </div>
                             <ul name="ingredients" id="ingredients">Ingredients: </ul>
@@ -359,12 +363,35 @@
                     if(e.target.id !== 'lightFilter' && e.target.id !== 'lightFilterButton'){
                       document.getElementById('lightFilter').style.display = 'none';
                     }
-                    if(e.target.id !== 'myDropdown' && e.target.id !== 'search'){
-                      document.getElementById('myDropdown').style.display = 'none';
+                    if(e.target.id !== 'ingredientDropdown' && e.target.id !== 'search'){
+                      document.getElementById('ingredientDropdown').style.display = 'none';
                     }
                 };
                 </script>
     <script src="scripts/dropdownSelection.js"></script>
+    <script>
+        const ingredientDropdown = document.getElementById('ingredientDropdown');
+        
+        var xmlhttp = new XMLHttpRequest;
+
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                //do display results code in searchRecipes.php, then put the responseText in the gallery
+                console.log("entered onreadystatechange");
+                let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+                let newIngredientDropdown = doc.getElementById("ingredientDropdown");
+                ingredientDropdown.parentNode.replaceChild(newIngredientDropdown, ingredientDropdown);
+
+                //TODO tags are present on the recipe elements, but not as buttons
+
+                console.log("ended onreadystatechange");
+              }
+        }
+
+        xmlhttp.open( "POST", "fillIngredientDropdown.php" );
+        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+        xmlhttp.send();//no need to send any data
+    </script>
     
   <script src="assets/web/assets/jquery/jquery.min.js"></script>
   <script src="assets/popper/popper.min.js"></script>
