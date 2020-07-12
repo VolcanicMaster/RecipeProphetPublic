@@ -96,8 +96,6 @@ $allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
 $allrecipesarray = json_decode($allrecipesfile);
 
-echo '<div>' . 'testing if divs work like this!' . '</div>';
-
 foreach($allrecipesarray as $row){
     //$row["ingredients"];
     echo '<div>' . $row["title"] . '</div>';
