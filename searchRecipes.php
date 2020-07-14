@@ -94,14 +94,19 @@ echo "<p>Ingredients Data Inserted</p>";
 
 $allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
-$allrecipesarray = json_decode($allrecipesfile);
+$separator = "\r\n";
+$line = strtok($allrecipesfile, $separator);
 
-foreach($allrecipesarray as $row){
-    //$row["ingredients"];
-    echo '<div>' . $row["title"] . '</div>';
+while ($line !== false) {
+    # do something with $line
+    $linearray = json_decode($line, true);
+    echo '<div>' . $linearray["title"] . '</div>';
     
+    # if all ingredients are valid, insert into database
     $sql = "INSERT INTO ";
     //$conn->query($sql);
+    # iterate
+    $line = strtok( $separator );
 }
 
 echo '</div>';
