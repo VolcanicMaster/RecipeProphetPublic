@@ -100,11 +100,19 @@ $line = strtok($allrecipesfile, $separator);
 while ($line !== false) {
     # do something with $line
     $linearray = json_decode($line, true);
+    echo '<div>';
     echo '<div>' . $linearray["title"] . '</div>';
+    $ingarray = $linearray["ingredients"];
+    foreach($ingarray as &$ing){
+        //check if $ing contains a valid ingredient
+        echo '<div>     ' . $ing  . '</div>';
+    }
     
     # if all ingredients are valid, insert into database
     $sql = "INSERT INTO ";
     //$conn->query($sql);
+    
+    echo '</div>';
     # iterate
     $line = strtok( $separator );
 }
