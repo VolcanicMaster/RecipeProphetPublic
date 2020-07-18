@@ -196,7 +196,9 @@
                                 generates ingredients list from database, 
                                 filterFunction limits number of ingredients shown at once
 
-                                TODO include ingredients like Salt, Olive Oil, Extra Virgin Olive Oil by default
+                                TODO use all words in parentheses for display
+
+                                TODO include ingredients like Salt, Olive Oil by default
                                     OR add a button that adds common ingredients
                                 TODO add RESET button that either clears or calls the "add default" function?
                         -->

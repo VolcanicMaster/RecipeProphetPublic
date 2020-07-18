@@ -68,29 +68,11 @@ if ($result->num_rows > 0) {
 }
 
 
-
-//TODO get list of ingredients and insert that into our ingredients database for reference here
-//TODO use a fuzzy search with the ingredients database entries as inputs and 
-//      they'll be searching each ingredient for each recipe
-
-
-/*
-$ingredientsfile = file_get_contents("tempRecipeJSON/testIngredients.json");
-
-$ingredients = json_decode($ingredientsfile);
-
-foreach($ingredients as $row){
-    $sql = "INSERT INTO ingredients(name, pictureLink) VALUES ('".$row["name"]."', '".$row["photo_url"]."')";
-    mysqli_query($conn, $sql);
-}
-
-echo "<p>Ingredients Data Inserted</p>";
-
-*/
-
 //TODO put code here that reads test json file with 2 entries and submits it to the database
 //(will only be run once when the program is completed)
 
+$sql = "SELECT name, tags FROM ingredients";
+$ingresult = $conn->query($sql);
 
 $allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
@@ -103,12 +85,77 @@ while ($line !== false) {
     echo '<div>';
     echo '<div>' . $linearray["title"] . '</div>';
     $ingarray = $linearray["ingredients"];
+    
+    $linecount = 0;
     foreach($ingarray as &$ing){
         //check if $ing contains a valid ingredient
-        echo '<div>     ' . $ing  . '</div>';
+        
+        // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
+        
+        $result = clone($ingresult);
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {        
+                //remove parentheses and words within
+                $name = $row["name"];
+                $pos = strpos($name, '(');
+                while($pos !=== false){
+                    $endpos = strpos($name, ')');
+                    $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+                    $pos = strpos($name, '(');
+                }
+                // if all words are included, 
+                //  do a query with that word and accept whichever result fits and is biggest.
+                $expname = explode("",$name);
+                foreach($expname as $word){
+                    $pos = strpos($ing, $word)
+                    if($pos === false){
+                        //output line number of invalid ingredients until we have a serviceable recipe database?
+                        echo '<div>Invalid ingredient on line ' . $linecount . '</div>';
+                        continue;
+                    }
+                }
+                // ingredient is valid
+                $sql = "SELECT name FROM ingredients WHERE name LIKE '%" . $name . "%'";
+                $result = $conn->query($sql);
+                
+                //accept whichever result has the most characters/words and is contained within $ing
+                $ingmax = "";
+                if($result->num_rows > 0){
+                    while($row = $result->fetch_assoc()){
+                        $exprow = explode("",$row["name"]);
+                        $corri = true; //tracks whether this ingredient may be correct based on content
+                        foreach($exprow as $word){
+                            $pos = strpos($ing, $word)
+                            if($pos === false){
+                                //this is not the right ingredient, continue with the next iteration...
+                                $corri = false;
+                                break;
+                            }
+                        }
+                        if($corri === true){
+                            //if this ingredient is bigger than the previous max, replace it
+                            if(strlen($row["name"]) > strlen($ingmax)){
+                                $ingmax = clone($row["name"]);
+                            }
+                        }
+                    }
+                } else {
+                    echo '<div>UNEXPECTED ERROR: valid ingredient name not found</div>';
+                }
+                echo '<div>';
+                echo '<div>JSON ingredient: ' . $ing . '</div>';
+                echo '<div>Closest ingredient: ' . $ingmax . '</div>';
+                echo '</div>';
+                break;
+            }
+        }
+        $linecount++;
     }
     
     # if all ingredients are valid, insert into database
+    //TODO assign tags based on the included ingredients (ingredients should have tags?)
+    // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
     $sql = "INSERT INTO ";
     //$conn->query($sql);
     
