@@ -99,23 +99,33 @@ while ($line !== false) {
                 //remove parentheses and words within
                 $name = $row["name"];
                 $pos = strpos($name, '(');
-                while($pos !=== false){
+                while($pos !== false){
                     $endpos = strpos($name, ')');
                     $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                     $pos = strpos($name, '(');
                 }
                 // if all words are included, 
                 //  do a query with that word and accept whichever result fits and is biggest.
-                $expname = explode("",$name);
+                $expname = explode(" ",$name);
+                $name = "";
+                $inving = false
                 foreach($expname as $word){
+                    $name = $name . $word . " ";
                     $pos = strpos($ing, $word)
                     if($pos === false){
                         //output line number of invalid ingredients until we have a serviceable recipe database?
                         echo '<div>Invalid ingredient on line ' . $linecount . '</div>';
-                        continue;
+                        //add boolean that makes it invalid
+                        $inving = true;
                     }
                 }
-                // ingredient is valid
+                $name = preg_replace('/\s+/', ' ', $name);
+                $name = trim($name, " ");
+                // if ingredient is invalid, just continue to the next row of the ingredients for now
+                //TODO if ingredient is invalid, the final code should ignore the entire recipe.
+                if($inving){
+                    continue;
+                }
                 $sql = "SELECT name FROM ingredients WHERE name LIKE '%" . $name . "%'";
                 $result = $conn->query($sql);
                 
@@ -143,6 +153,7 @@ while ($line !== false) {
                 } else {
                     echo '<div>UNEXPECTED ERROR: valid ingredient name not found</div>';
                 }
+                //found the ingredient, break and move onto the next ingredient in the recipe
                 echo '<div>';
                 echo '<div>JSON ingredient: ' . $ing . '</div>';
                 echo '<div>Closest ingredient: ' . $ingmax . '</div>';
