@@ -71,8 +71,14 @@ if ($result->num_rows > 0) {
 //TODO put code here that reads test json file with 2 entries and submits it to the database
 //(will only be run once when the program is completed)
 
-$sql = "SELECT name, tags FROM ingredients";
-$ingresult = $conn->query($sql);
+$ingsql = "SELECT name, tags FROM ingredients;";
+$ingresult = $conn->query($ingsql);
+$dbings = array();
+if($ingresult->num_rows > 0){
+    while($row = $ingresult->fetch_assoc()){
+        $dbings[] = $row;
+    }
+}
 
 $allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
@@ -83,84 +89,93 @@ while ($line !== false) {
     # do something with $line
     $linearray = json_decode($line, true);
     echo '<div>';
-    echo '<div>' . $linearray["title"] . '</div>';
+    echo '<p>' . $linearray["title"] . '</p>';
     $ingarray = $linearray["ingredients"];
     
     $linecount = 0;
-    foreach($ingarray as &$ing){
+    foreach($ingarray as $ing){
+        
         //check if $ing contains a valid ingredient
         
         // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
         
-        $result = clone($ingresult);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {        
-                //remove parentheses and words within
-                $name = $row["name"];
+        // output data of each row
+        foreach($dbings as $ingrow){
+            //remove parentheses and words within
+            $name = clone($ingrow["name"]);
+
+            //TODO: echoing anything from within this loop does not appear
+            echo '<p> DB ing name </p>';
+
+            $pos = strpos($name, '(');
+
+            while($pos !== false){
+                $endpos = strpos($name, ')');
+                $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                 $pos = strpos($name, '(');
-                while($pos !== false){
-                    $endpos = strpos($name, ')');
-                    $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
-                    $pos = strpos($name, '(');
-                }
-                // if all words are included, 
-                //  do a query with that word and accept whichever result fits and is biggest.
-                $expname = explode(" ",$name);
-                $name = "";
-                $inving = false
-                foreach($expname as $word){
-                    $name = $name . $word . " ";
-                    $pos = strpos($ing, $word)
-                    if($pos === false){
-                        //output line number of invalid ingredients until we have a serviceable recipe database?
-                        echo '<div>Invalid ingredient on line ' . $linecount . '</div>';
-                        //add boolean that makes it invalid
-                        $inving = true;
-                    }
-                }
-                $name = preg_replace('/\s+/', ' ', $name);
-                $name = trim($name, " ");
-                // if ingredient is invalid, just continue to the next row of the ingredients for now
-                //TODO if ingredient is invalid, the final code should ignore the entire recipe.
-                if($inving){
-                    continue;
-                }
-                $sql = "SELECT name FROM ingredients WHERE name LIKE '%" . $name . "%'";
-                $result = $conn->query($sql);
-                
-                //accept whichever result has the most characters/words and is contained within $ing
-                $ingmax = "";
-                if($result->num_rows > 0){
-                    while($row = $result->fetch_assoc()){
-                        $exprow = explode("",$row["name"]);
-                        $corri = true; //tracks whether this ingredient may be correct based on content
-                        foreach($exprow as $word){
-                            $pos = strpos($ing, $word)
-                            if($pos === false){
-                                //this is not the right ingredient, continue with the next iteration...
-                                $corri = false;
-                                break;
-                            }
-                        }
-                        if($corri === true){
-                            //if this ingredient is bigger than the previous max, replace it
-                            if(strlen($row["name"]) > strlen($ingmax)){
-                                $ingmax = clone($row["name"]);
-                            }
-                        }
-                    }
-                } else {
-                    echo '<div>UNEXPECTED ERROR: valid ingredient name not found</div>';
-                }
-                //found the ingredient, break and move onto the next ingredient in the recipe
-                echo '<div>';
-                echo '<div>JSON ingredient: ' . $ing . '</div>';
-                echo '<div>Closest ingredient: ' . $ingmax . '</div>';
-                echo '</div>';
-                break;
             }
+            // if all words are included, 
+            //  do a query with that word and accept whichever result fits and is biggest.
+            $expname = explode(" ",clone($name));
+            $name = "";
+            $inving = false;
+            //TODO we DON'T have to replace all files every time, just the one(s) we edit.
+            foreach($expname as $word){
+                $name = $name . $word . " ";
+                $pos = strpos($ing, $word);
+                if($pos === false){
+                    //this is not the right ingredient, continue
+                    $wroing = true;
+                    break; //break out of the foreach loop
+                }
+            }
+            $name = "Milk ";
+            $name = preg_replace('/\s+/', ' ', $name);
+            $name = trim($name, " ");
+            // if ingredient is wrong, just continue to the next row of the ingredients db
+            if($wroing){
+                continue;
+            }
+
+            $sql = "SELECT name FROM ingredients WHERE name LIKE '%" . $name . "%'";
+            $result = $conn->query($sql);
+
+            //accept whichever result has the most characters/words and is contained within $ing
+            $ingmax = "";
+            if($result->num_rows > 0){
+                while($row = $result->fetch_assoc()){
+                    $exprow = explode("",$row["name"]);
+                    $corri = true; //tracks whether this ingredient may be correct based on content
+                    foreach($exprow as $word){
+                        $pos = strpos($ing, $word);
+                        if($pos === false){
+                            //this is not the right ingredient, continue with the next iteration...
+                            $corri = false;
+                            break;
+                        }
+                    }
+                    if($corri === true){
+                        //if this ingredient is bigger than the previous max, replace it
+                        if(strlen($row["name"]) > strlen($ingmax)){
+                            $ingmax = clone($row["name"]);
+                        }
+                    }
+                }
+            } else {
+                echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
+            }
+            //found the ingredient, break and move onto the next ingredient in the recipe
+
+            echo '<div>';
+            echo '<p>JSON ingredient: ' . $ing . '</p>';
+            echo '<p>Closest ingredient: ' . $ingmax . '</p>';
+            echo '</div>';
+            break;
         }
+        //If no ingredient in the db matches the one in the json, print that it is invalid
+        //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+        //output line number of invalid ingredients until we have a serviceable recipe database?
+        echo '<p> Invalid ingredient: ' . $ing . ' on line ' . $linecount . '</p>';
         $linecount++;
     }
     
