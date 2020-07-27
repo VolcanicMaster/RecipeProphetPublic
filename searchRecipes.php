@@ -38,52 +38,32 @@ echo '<div id="newRecipeProphetRecipeGallery">';
 //TODO searchForRecipes that returns a sorted list of recipes
 //TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
-// Query that selects recipes which only contain ingredients from the constraint list
-$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
 
+//Query for ingredients
+$sql = "SELECT name, tags FROM ingredients;";
 $result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    // output data of each row
-    //use echos within a loop to generate the gallery
-    while($row = $result->fetch_assoc()) {        
-        /*
-        <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
-        */
-        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
-            . $row["tags"] 
-            . ' onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
-        echo '<div class="crop">';
-        echo '<img src="' . $row["imglink"] . '" alt="" title="">';
-        echo '<span class="icon-focus"></span>';
-        echo '<span class="mbr-gallery-title mbr-fonts-style display-7">' . $row["name"] . '</span>';
-        echo '</div>';
-        
-        echo '</div>';
-        
-    //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
+$dbings = array();
+if($result->num_rows > 0){
+    echo '<p>if ingres</p>';
+    while($row = $result->fetch_assoc()){
+        //echo '<p>test while</p>';
+        $dbings[] = $row;
     }
-} else {
-    //echo "0 results";
 }
+
+
+
+
 
 
 //TODO put code here that reads test json file with 2 entries and submits it to the database
 //(will only be run once when the program is completed)
 
-$ingsql = "SELECT name, tags FROM ingredients;";
-$ingresult = $conn->query($ingsql);
-$dbings = array();
-if($ingresult->num_rows > 0){
-    while($row = $ingresult->fetch_assoc()){
-        $dbings[] = $row;
-    }
-}
 
-$allrecipesfile = file_get_contents("tempRecipeJSON/testRecipes.json");
+$arfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
-$separator = "\r\n";
-$line = strtok($allrecipesfile, $separator);
+$sep = "\r\n";
+$line = strtok($arfile, $sep);
 
 while ($line !== false) {
     # do something with $line
@@ -102,10 +82,7 @@ while ($line !== false) {
         // output data of each row
         foreach($dbings as $ingrow){
             //remove parentheses and words within
-            $name = clone($ingrow["name"]);
-
-            //TODO: echoing anything from within this loop does not appear
-            echo '<p> DB ing name </p>';
+            $name = $ingrow["name"];
 
             $pos = strpos($name, '(');
 
@@ -113,13 +90,13 @@ while ($line !== false) {
                 $endpos = strpos($name, ')');
                 $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                 $pos = strpos($name, '(');
+                echo '<p>'. $name .'</p>';
             }
             // if all words are included, 
             //  do a query with that word and accept whichever result fits and is biggest.
-            $expname = explode(" ",clone($name));
+            $expname = explode(" ",$name);
             $name = "";
             $inving = false;
-            //TODO we DON'T have to replace all files every time, just the one(s) we edit.
             foreach($expname as $word){
                 $name = $name . $word . " ";
                 $pos = strpos($ing, $word);
@@ -157,7 +134,7 @@ while ($line !== false) {
                     if($corri === true){
                         //if this ingredient is bigger than the previous max, replace it
                         if(strlen($row["name"]) > strlen($ingmax)){
-                            $ingmax = clone($row["name"]);
+                            $ingmax = $row["name"];
                         }
                     }
                 }
@@ -187,7 +164,36 @@ while ($line !== false) {
     
     echo '</div>';
     # iterate
-    $line = strtok( $separator );
+    $line = strtok( $sep );
+}
+
+
+// Query that selects recipes which only contain ingredients from the constraint list
+$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
+
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    // output data of each row
+    //use echos within a loop to generate the gallery
+    while($row = $result->fetch_assoc()) {        
+        /*
+        <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
+        */
+        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
+            . $row["tags"] 
+            . ' onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
+        echo '<div class="crop">';
+        echo '<img src="' . $row["imglink"] . '" alt="" title="">';
+        echo '<span class="icon-focus"></span>';
+        echo '<span class="mbr-gallery-title mbr-fonts-style display-7">' . $row["name"] . '</span>';
+        echo '</div>';
+        
+        echo '</div>';
+        
+    //echo "id: " . $row["id"]. " - Link: " . $row["link"]. " - Name: " . $row["name"]. "<br>";
+    }
+} else {
+    //echo "0 results";
 }
 
 echo '</div>';
