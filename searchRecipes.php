@@ -35,7 +35,7 @@ $id = $dom->getElementById('my_id');*/
 
 echo '<div id="newRecipeProphetRecipeGallery">';
 
-//TODO searchForRecipes that returns a sorted list of recipes
+//searchForRecipes that returns a sorted list of recipes
 //TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
 
@@ -51,7 +51,7 @@ if($result->num_rows > 0){
     }
 }
 
-
+//TODO are all ingredients in the database being iterated through?
 
 
 
@@ -74,6 +74,7 @@ while ($line !== false) {
     
     $linecount = 0;
     foreach($ingarray as $ing){
+        $ifound = false;
         
         //check if $ing contains a valid ingredient
         
@@ -92,25 +93,9 @@ while ($line !== false) {
                 $pos = strpos($name, '(');
                 echo '<p>'. $name .'</p>';
             }
-            // if all words are included, 
-            //  do a query with that word and accept whichever result fits and is biggest.
-            $expname = explode(" ",$name);
-            $name = "";
-            $inving = false;
-            foreach($expname as $word){
-                $name = $name . $word . " ";
-                $pos = strpos($ing, $word);
-                if($pos === false){
-                    //this is not the right ingredient, continue
-                    $wroing = true;
-                    break; //break out of the foreach loop
-                }
-            }
-            $name = "Milk ";
-            $name = preg_replace('/\s+/', ' ', $name);
-            $name = trim($name, " ");
+            // if the ingredient contains the dbingredient, query it to find the best match
             // if ingredient is wrong, just continue to the next row of the ingredients db
-            if($wroing){
+            if(strpos($ing,$name) === false){
                 continue;
             }
 
@@ -147,12 +132,15 @@ while ($line !== false) {
             echo '<p>JSON ingredient: ' . $ing . '</p>';
             echo '<p>Closest ingredient: ' . $ingmax . '</p>';
             echo '</div>';
+            $ifound = true;
             break;
         }
         //If no ingredient in the db matches the one in the json, print that it is invalid
         //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
         //output line number of invalid ingredients until we have a serviceable recipe database?
-        echo '<p> Invalid ingredient: ' . $ing . ' on line ' . $linecount . '</p>';
+        if(!$ifound){
+            echo '<p> Invalid ingredient: ' . $ing . ' on line ' . $linecount . '</p>';
+        }
         $linecount++;
     }
     
