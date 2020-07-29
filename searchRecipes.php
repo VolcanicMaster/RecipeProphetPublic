@@ -46,15 +46,9 @@ $dbings = array();
 if($result->num_rows > 0){
     echo '<p>if ingres</p>';
     while($row = $result->fetch_assoc()){
-        //echo '<p>test while</p>';
         $dbings[] = $row;
     }
 }
-
-//TODO are all ingredients in the database being iterated through?
-
-
-
 
 //TODO put code here that reads test json file with 2 entries and submits it to the database
 //(will only be run once when the program is completed)
@@ -65,6 +59,8 @@ $arfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 $sep = "\r\n";
 $line = strtok($arfile, $sep);
 
+//TODO make both ingredients from db and ingredients from json lowercase?
+
 while ($line !== false) {
     # do something with $line
     $linearray = json_decode($line, true);
@@ -74,6 +70,7 @@ while ($line !== false) {
     
     $linecount = 0;
     foreach($ingarray as $ing){
+        $ing = strtolower($ing);
         $ifound = false;
         
         //check if $ing contains a valid ingredient
@@ -83,7 +80,7 @@ while ($line !== false) {
         // output data of each row
         foreach($dbings as $ingrow){
             //remove parentheses and words within
-            $name = $ingrow["name"];
+            $name = strtolower($ingrow["name"]);
 
             $pos = strpos($name, '(');
 
@@ -91,7 +88,6 @@ while ($line !== false) {
                 $endpos = strpos($name, ')');
                 $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                 $pos = strpos($name, '(');
-                echo '<p>'. $name .'</p>';
             }
             // if the ingredient contains the dbingredient, query it to find the best match
             // if ingredient is wrong, just continue to the next row of the ingredients db
