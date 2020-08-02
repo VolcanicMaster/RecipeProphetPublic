@@ -50,16 +50,18 @@ if($result->num_rows > 0){
     }
 }
 
+//TODO only read the json file, and add ingredients manually based on what is invalid
+
 //TODO put code here that reads test json file with 2 entries and submits it to the database
 //(will only be run once when the program is completed)
+
+//TODOlater put both the script and html for the tag selection into this php
 
 
 $arfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
 $sep = "\r\n";
 $line = strtok($arfile, $sep);
-
-//TODO make both ingredients from db and ingredients from json lowercase?
 
 while ($line !== false) {
     # do something with $line

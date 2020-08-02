@@ -146,7 +146,7 @@
 
     <div class="container align-center">
         <div class="row justify-content-md-center">
-            <div class="mbr-white col-md-10">
+            <div id="homeMainDisplayDiv" class="mbr-white col-md-10">
                 <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style display-1">
                     Enter Ingredients, <br>Find Recipes</h1>
                 
@@ -208,11 +208,7 @@
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
                               <div id="ingredientDropdown" class="dropdown-content">
-                                <p id="lettuceSelection" onclick="selectElementFromTextArea('lettuceSelection','ingredientDropdown','search')">Lettuce</p>
-                                <p id="appleSelection" onclick="selectElementFromTextArea('appleSelection','ingredientDropdown','search')">Apple</p>
-                                <p id="mozzarellaSelection" onclick="selectElementFromTextArea('mozzarellaSelection','ingredientDropdown','search')">Mozzarella Cheese</p>
-                                <p id="chickenSelection" onclick="selectElementFromTextArea('chickenSelection','ingredientDropdown','search')">Chicken</p>
-                                <p id="pastaSelection" onclick="selectElementFromTextArea('pastaSelection','ingredientDropdown','search')">Pasta / Noodles</p>
+                                
                               </div>
                             </div>
                             <ul name="ingredients" id="ingredients">Ingredients: </ul>
@@ -371,6 +367,7 @@
                 };
                 </script>
     <script src="scripts/dropdownSelection.js"></script>
+    <!--TODO: only run dropdownSelection after fillIngredientDropdown has completed?-->
     <script>
         const ingredientDropdown = document.getElementById('ingredientDropdown');
         

@@ -31,29 +31,46 @@ function filterFunction() {
 }*/
 
 function filterFunction(inputID,dropdownID) {
-  var input, filter, ul, li, p, i, count;
-  input = document.getElementById(inputID);
-  filter = input.value.toUpperCase();
-  div = document.getElementById(dropdownID);
-  p = div.getElementsByTagName("p");
-    count = 0;
+    var input, filter, div, p, i, lim, pafter, disp, dispdiv, para, txtValue;
+    input = document.getElementById(inputID);
+    filter = input.value.toUpperCase();
+    div = document.getElementById(dropdownID);
+    p = div.getElementsByTagName("p");
+    lim = 0;
+    pafter = [];
+    disp = document.getElementById("homeMainDisplayDiv");
 
-  $(div).show();
-  //div.classList.show();
+    
+    //div.classList.show();
 
-  for (i = 0; i < p.length; i++) {
-      if(count > 10){
+    for (i = 0; i < p.length; i++) {
+        if(lim > 1){
             //limit number of elements shown
-            break;
+            //TODO breaking doesn't do it, instead set everything else to "none";
+            //TODO count is not working?
+            //pafter.push("count>10");
+            p[i].style.display = "none";
+        } else {
+            txtValue = p[i].textContent || p[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                //pafter.push("let".concat(txtValue).concat(" through the filter"));
+                p[i].style.display = "";
+                lim++;
+            } else {
+                p[i].style.display = "none";
+            }
         }
-    txtValue = p[i].textContent || p[i].innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      p[i].style.display = "";
-        count++;
-    } else {
-      p[i].style.display = "none";
     }
-  }
+    $(div).show();
+    /*
+    dispdiv = document.createElement("div");
+    for(i = 0; i < pafter.length; i++){
+        //create a new p node and display the text
+        para = document.createElement("p");
+        para.textContent = pafter[i];
+        dispdiv.appendChild(para);
+    }
+    disp.appendChild(dispdiv);*/
 }
 
     /*
