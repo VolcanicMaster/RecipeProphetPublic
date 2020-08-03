@@ -51,12 +51,16 @@ if($result->num_rows > 0){
 }
 
 //TODO only read the json file, and add ingredients manually based on what is invalid
+//TODO split the json file (auto?) into parts so it can actually run?
 
-//TODO put code here that reads test json file with 2 entries and submits it to the database
+//TODO BEFORE DB UPL: some ings have "(optional)" at the end, make sure the recipeIngredient tags optional as TRUE (1)
+
+//TODO put code here that reads the split json files and submits valid recipes to the database
 //(will only be run once when the program is completed)
 
 //TODOlater put both the script and html for the tag selection into this php
 
+$recings = array();
 
 $arfile = file_get_contents("tempRecipeJSON/testRecipes.json");
 
@@ -76,6 +80,11 @@ while ($line !== false) {
         $ifound = false;
         
         //check if $ing contains a valid ingredient
+        
+        //IF IT HAS A COLON, IGNORE THAT INGREDIENT (so it doesn't invalidate)
+        if(strpos($ing, ':') !== false){
+            continue;
+        }
         
         // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
         
@@ -102,6 +111,7 @@ while ($line !== false) {
 
             //accept whichever result has the most characters/words and is contained within $ing
             $ingmax = "";
+            $imaxid = "";
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
                     $exprow = explode("",$row["name"]);
@@ -118,6 +128,13 @@ while ($line !== false) {
                         //if this ingredient is bigger than the previous max, replace it
                         if(strlen($row["name"]) > strlen($ingmax)){
                             $ingmax = $row["name"];
+                            $imaxid = $row["id"];
+                            $imaxta = $row["tags"]
+                            //TODO use parsing to determine whether this ingredient is optional
+                            $imaxop = 0;
+                            if(strpos($ing,"(optional)") !== false){
+                                $imaxop = 1;
+                            }
                         }
                     }
                 }
@@ -131,22 +148,77 @@ while ($line !== false) {
             echo '<p>Closest ingredient: ' . $ingmax . '</p>';
             echo '</div>';
             $ifound = true;
+            $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
             break;
         }
         //If no ingredient in the db matches the one in the json, print that it is invalid
-        //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
         //output line number of invalid ingredients until we have a serviceable recipe database?
-        if(!$ifound){
+        if($ifound){
+            
+        } else {
             echo '<p> Invalid ingredient: ' . $ing . ' on line ' . $linecount . '</p>';
+            //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+            break;
         }
         $linecount++;
     }
     
     # if all ingredients are valid, insert into database
-    //TODO assign tags based on the included ingredients (ingredients should have tags?)
+    
+    $ilink = $linearray["photo_url"];
+    
+    $link = $linearray["url"];
+    
+    $name = $linearray["title"];
+    
+    $tags = "";
+    //TODO: before the below, add tags to every ingredient
+    // assign tags based on the included ingredients (ingredients should have tags?)
     // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
-    $sql = "INSERT INTO ";
-    //$conn->query($sql);
+    $lname = strtolower($name);
+    if(strpos($lname,"salad") !== false){
+        $tags = $tags . "Salad,";
+    }
+    if(strpos($lname,"spicy") !== false){
+        $tags = $tags . "Spicy,";
+    }
+    if(strpos($lname,"thai") !== false){
+        $tags = $tags . "Thai,";
+    }
+    if(strpos($lname,"chinese") !== false){
+        $tags = $tags . "Chinese,";
+    }
+    if(strpos($lname,"japanese") !== false){
+        $tags = $tags . "Japanese,";
+    }
+    if(strpos($lname,"american") !== false){
+        $tags = $tags . "American,";
+    }
+    if(strpos($lname,"indian") !== false){
+        $tags = $tags . "Indian,";
+    }
+    
+    foreach($recings as $recing){
+        $tags = $tags . $recing["tags"] . ",";
+    }
+    //remove trailing comma
+    $tags = rtrim($tags, ",");
+    //remove duplicate tags
+    $tags = implode(',',array_unique(explode(',', $tags)));
+    
+    $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
+    $conn->query($sql);
+    
+    //Then, insert the ingredients into recipeIngredients
+
+    //find the recipe_id this connection just added
+    $sql = 'SELECT LAST_INSERT_ID();';
+    $recid = $conn->query($sql);
+    
+    foreach($recings as $recing){
+        $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
+        $conn->query($sql);
+    }
     
     echo '</div>';
     # iterate

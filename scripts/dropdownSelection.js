@@ -44,7 +44,7 @@ function filterFunction(inputID,dropdownID) {
     //div.classList.show();
 
     for (i = 0; i < p.length; i++) {
-        if(lim > 1){
+        if(lim >= 5){
             //limit number of elements shown
             //TODO breaking doesn't do it, instead set everything else to "none";
             //TODO count is not working?
