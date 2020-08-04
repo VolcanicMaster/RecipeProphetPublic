@@ -40,7 +40,7 @@ echo '<div id="newRecipeProphetRecipeGallery">';
 
 
 //Query for ingredients
-$sql = "SELECT name, tags FROM ingredients;";
+$sql = "SELECT name FROM ingredients;";
 $result = $conn->query($sql);
 $dbings = array();
 if($result->num_rows > 0){
@@ -74,7 +74,7 @@ while ($line !== false) {
     echo '<p>' . $linearray["title"] . '</p>';
     $ingarray = $linearray["ingredients"];
     
-    $linecount = 0;
+    $skipre = false;
     foreach($ingarray as $ing){
         $ing = strtolower($ing);
         $ifound = false;
@@ -106,12 +106,14 @@ while ($line !== false) {
                 continue;
             }
 
-            $sql = "SELECT name FROM ingredients WHERE name LIKE '%" . $name . "%'";
+            $sql = "SELECT name, id, tags FROM ingredients WHERE name LIKE '%" . $name . "%'";
             $result = $conn->query($sql);
 
             //accept whichever result has the most characters/words and is contained within $ing
             $ingmax = "";
             $imaxid = "";
+            $imaxta = "";
+            $imaxop = 0;
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
                     $exprow = explode("",$row["name"]);
@@ -129,14 +131,17 @@ while ($line !== false) {
                         if(strlen($row["name"]) > strlen($ingmax)){
                             $ingmax = $row["name"];
                             $imaxid = $row["id"];
-                            $imaxta = $row["tags"]
+                            $imaxta = $row["tags"];
                             //TODO use parsing to determine whether this ingredient is optional
-                            $imaxop = 0;
                             if(strpos($ing,"(optional)") !== false){
                                 $imaxop = 1;
                             }
                         }
                     }
+                }
+                if($ingmax == ""){
+                    echo '<p>corri never returned true</p>';
+                    continue;
                 }
             } else {
                 echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
@@ -156,70 +161,77 @@ while ($line !== false) {
         if($ifound){
             
         } else {
-            echo '<p> Invalid ingredient: ' . $ing . ' on line ' . $linecount . '</p>';
+            echo '<p> Invalid ingredient: ' . $ing . '</p>';
             //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+            //skip to the next recipe
+            $skipre = true;
             break;
         }
-        $linecount++;
     }
     
-    # if all ingredients are valid, insert into database
-    
-    $ilink = $linearray["photo_url"];
-    
-    $link = $linearray["url"];
-    
-    $name = $linearray["title"];
-    
-    $tags = "";
-    //TODO: before the below, add tags to every ingredient
-    // assign tags based on the included ingredients (ingredients should have tags?)
-    // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
-    $lname = strtolower($name);
-    if(strpos($lname,"salad") !== false){
-        $tags = $tags . "Salad,";
-    }
-    if(strpos($lname,"spicy") !== false){
-        $tags = $tags . "Spicy,";
-    }
-    if(strpos($lname,"thai") !== false){
-        $tags = $tags . "Thai,";
-    }
-    if(strpos($lname,"chinese") !== false){
-        $tags = $tags . "Chinese,";
-    }
-    if(strpos($lname,"japanese") !== false){
-        $tags = $tags . "Japanese,";
-    }
-    if(strpos($lname,"american") !== false){
-        $tags = $tags . "American,";
-    }
-    if(strpos($lname,"indian") !== false){
-        $tags = $tags . "Indian,";
-    }
-    
-    foreach($recings as $recing){
-        $tags = $tags . $recing["tags"] . ",";
-    }
-    //remove trailing comma
-    $tags = rtrim($tags, ",");
-    //remove duplicate tags
-    $tags = implode(',',array_unique(explode(',', $tags)));
-    
-    $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
-    $conn->query($sql);
-    
-    //Then, insert the ingredients into recipeIngredients
+    if(!$skipre){
 
-    //find the recipe_id this connection just added
-    $sql = 'SELECT LAST_INSERT_ID();';
-    $recid = $conn->query($sql);
-    
-    foreach($recings as $recing){
-        $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
+        # if all ingredients are valid, insert into database
+
+        $ilink = $linearray["photo_url"];
+
+        $link = $linearray["url"];
+
+        $name = $linearray["title"];
+
+        $tags = "";
+        //TODO: before DB UPLOAD, add tags to every ingredient in the database
+        // assign tags based on the included ingredients (ingredients should have tags?)
+        // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
+        $lname = strtolower($name);
+        if(strpos($lname,"salad") !== false){
+            $tags = $tags . "Salad,";
+        }
+        if(strpos($lname,"spicy") !== false){
+            $tags = $tags . "Spicy,";
+        }
+        if(strpos($lname,"thai") !== false){
+            $tags = $tags . "Thai,";
+        }
+        if(strpos($lname,"chinese") !== false){
+            $tags = $tags . "Chinese,";
+        }
+        if(strpos($lname,"japanese") !== false){
+            $tags = $tags . "Japanese,";
+        }
+        if(strpos($lname,"american") !== false){
+            $tags = $tags . "American,";
+        }
+        if(strpos($lname,"indian") !== false){
+            $tags = $tags . "Indian,";
+        }
+        //--TODO error from here
+        /*
+        foreach($recings as $recing){
+            $tags = $tags . $recing["tags"] . ",";
+        }
+        //remove trailing comma
+        $tags = rtrim($tags, ",");
+        //remove duplicate tags
+        $tags = implode(',',array_unique(explode(',', $tags)));
+
+        $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
         $conn->query($sql);
+
+        //Then, insert the ingredients into recipeIngredients
+
+        //find the recipe_id this connection just added
+        //TODO this is probably the error
+        $sql = 'SELECT LAST_INSERT_ID();';
+        $recid = $conn->query($sql);
+        //$recid = 10; //for testing purposes
+
+        foreach($recings as $recing){
+            $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
+            $conn->query($sql);
+        }*/
+        //--TODO to here
     }
-    
     echo '</div>';
     # iterate
     $line = strtok( $sep );
