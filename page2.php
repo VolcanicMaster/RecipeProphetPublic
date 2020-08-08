@@ -109,7 +109,6 @@
     <?php
         include "scripts/dbConnect.php"
     ?>
-    
     <script src="scripts/databaseManipulator.js"></script>
     <!--<script src="scripts/recipeSearch.js"></script>-->
     <script>

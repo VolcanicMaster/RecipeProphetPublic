@@ -53,8 +53,6 @@ if($result->num_rows > 0){
 //TODO only read the json file, and add ingredients manually based on what is invalid
 //TODO split the json file (auto?) into parts so it can actually run?
 
-//TODO BEFORE DB UPL: some ings have "(optional)" at the end, make sure the recipeIngredient tags optional as TRUE (1)
-
 //TODO put code here that reads the split json files and submits valid recipes to the database
 //(will only be run once when the program is completed)
 
@@ -129,10 +127,11 @@ while ($line !== false) {
                     if($corri === true){
                         //if this ingredient is bigger than the previous max, replace it
                         if(strlen($row["name"]) > strlen($ingmax)){
+                            //TODO prevent duplicate ingredients (If it's been used before, it can't be used now)
                             $ingmax = $row["name"];
                             $imaxid = $row["id"];
                             $imaxta = $row["tags"];
-                            //TODO use parsing to determine whether this ingredient is optional
+                            //use parsing to determine whether this ingredient is optional
                             if(strpos($ing,"(optional)") !== false){
                                 $imaxop = 1;
                             }
@@ -162,7 +161,7 @@ while ($line !== false) {
             
         } else {
             echo '<p> Invalid ingredient: ' . $ing . '</p>';
-            //TODO if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+            //if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
             //skip to the next recipe
             $skipre = true;
             break;
@@ -205,8 +204,7 @@ while ($line !== false) {
         if(strpos($lname,"indian") !== false){
             $tags = $tags . "Indian,";
         }
-        //--TODO error from here
-        /*
+        
         foreach($recings as $recing){
             $tags = $tags . $recing["tags"] . ",";
         }
@@ -215,6 +213,15 @@ while ($line !== false) {
         //remove duplicate tags
         $tags = implode(',',array_unique(explode(',', $tags)));
 
+        //TODO stop the code as a whole from inserting the same r/ri twice, use echos to identify why?
+        //TODO add a login for a page exclusively made for testing (required once it gets advertised)
+        //(We have the login now, all you have to do is add: 
+//        session_start();
+//
+//        if (!isset($_SESSION['loggedin'])) {
+//          header('Location: adminLogin.php');
+//          exit; 
+//        }
         $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
         $conn->query($sql);
 
@@ -222,15 +229,14 @@ while ($line !== false) {
 
         //find the recipe_id this connection just added
         //TODO this is probably the error
-        $sql = 'SELECT LAST_INSERT_ID();';
-        $recid = $conn->query($sql);
-        //$recid = 10; //for testing purposes
+        /*$sql = 'SELECT LAST_INSERT_ID();';
+        $recid = $conn->query($sql);*/
+        $recid = 10; //for testing purposes
 
         foreach($recings as $recing){
             $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
             $conn->query($sql);
-        }*/
-        //--TODO to here
+        }
     }
     echo '</div>';
     # iterate
