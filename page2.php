@@ -122,56 +122,63 @@
         var listOfIngredients = [];
         
         function getListOfIngredientsAndSendToSearchRecipes(listOfIngredients){
-            console.log("entered getLOIEtc");
-            let objectStore = db.transaction('notes_os').objectStore('notes_os');
-            objectStore.openCursor().onsuccess = function(e) {
-                console.log("entered objectStore.openCursor().onsuccess");
-                // Get a reference to the cursor
-                let cursor = e.target.result;
+            if(recipeGallery.parentNode == null){}else{
+                console.log("entered getLOIEtc");
+                let objectStore = db.transaction('notes_os').objectStore('notes_os');
+                objectStore.openCursor().onsuccess = function(e) {
+                    console.log("entered objectStore.openCursor().onsuccess");
+                    // Get a reference to the cursor
+                    let cursor = e.target.result;
 
-                // If there is still another data item to iterate through, keep running this code
-                if(cursor) {
-                    console.log("entered if cursor");
-                    //add this ingredient to an easily accessible array
-                    listOfIngredients.push(cursor.value.name);
-                    cursor.continue();
-                } else {
-                    console.log("entered else cursor");
-                    var xmlhttp = new XMLHttpRequest;
+                    // If there is still another data item to iterate through, keep running this code
+                    if(cursor) {
+                        console.log("entered if cursor");
+                        //add this ingredient to an easily accessible array
+                        listOfIngredients.push(cursor.value.name);
+                        cursor.continue();
+                    } else {
+                        console.log("entered else cursor");
+                        var xmlhttp = new XMLHttpRequest;
 
-                    xmlhttp.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                            //do display results code in searchRecipes.php, then put the responseText in the gallery
-                            console.log("entered onreadystatechange");
-                            let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
-                            let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
-                            recipeGallery.parentNode.replaceChild(newRecipeGallery, recipeGallery);
-                            
-                            //TODO tags are present on the recipe elements, but not as buttons
-                            
-                            console.log("ended onreadystatechange");
-                          }
+                        xmlhttp.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                //do display results code in searchRecipes.php, then put the responseText in the gallery
+                                console.log("entered onreadystatechange");
+                                let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+                                let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
+                                recipeGallery.parentNode.replaceChild(newRecipeGallery, recipeGallery);
+
+                                //TODO tags are present on the recipe elements, but not as buttons
+
+                                console.log("ended onreadystatechange");
+                              }
+                        }
+
+                        xmlhttp.open( "POST", "searchRecipes.php" );
+                        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+                        xmlhttp.send( JSON.stringify(listOfIngredients) );
+                        return listOfIngredients;
                     }
-
-                    xmlhttp.open( "POST", "searchRecipes.php" );
-                    xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-                    xmlhttp.send( JSON.stringify(listOfIngredients) );
-                    return listOfIngredients;
                 }
             }
         }
         
-        //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
-        setUpCompleted.registerListener(function(val) {
-            console.log("Changed the value of setUpCompleted.a to " + val);
-            if(val == true){
-                listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
-                //Ensure that setUpCompleted is set back to false right after the functions finish
-                setUpCompleted.a = false;
-            }
-        });
+//        if(recipeGallery.parentNode == null){
+//           
+//        } else {
+        
+            //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
+            setUpCompleted.registerListener(function(val) {
+                console.log("Changed the value of setUpCompleted.a to " + val);
+                if(val == true){
+                    listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
+                    //Ensure that setUpCompleted is set back to false right after the functions finish
+                    setUpCompleted.a = false;
+                }
+            });
 
-        setUpDatabase();
+            setUpDatabase();
+        
         
     </script>
     

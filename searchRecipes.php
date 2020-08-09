@@ -6,6 +6,14 @@
     include "scripts/dbConnect.php"
 ?>
 <?php
+        
+//TODO This alone DOES NOT work.
+//session_start();
+//
+//if (!isset($_SESSION['loggedin'])) {
+//    header('Location: adminLogin.php');
+//    exit; 
+//}
 
 $data = file_get_contents( "php://input" ); //$data is now the string '[1,2,3]';
 
@@ -213,15 +221,8 @@ while ($line !== false) {
         //remove duplicate tags
         $tags = implode(',',array_unique(explode(',', $tags)));
 
+        echo "<p>INSERTING...</p>";
         //TODO stop the code as a whole from inserting the same r/ri twice, use echos to identify why?
-        //TODO add a login for a page exclusively made for testing (required once it gets advertised)
-        //(We have the login now, all you have to do is add: 
-//        session_start();
-//
-//        if (!isset($_SESSION['loggedin'])) {
-//          header('Location: adminLogin.php');
-//          exit; 
-//        }
         $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
         $conn->query($sql);
 
