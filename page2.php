@@ -122,7 +122,7 @@
         var listOfIngredients = [];
         
         function getListOfIngredientsAndSendToSearchRecipes(listOfIngredients){
-            if(recipeGallery.parentNode == null){}else{
+            if(recipeGallery.parentNode == null || recipeGallery == null){}else{
                 console.log("entered getLOIEtc");
                 let objectStore = db.transaction('notes_os').objectStore('notes_os');
                 objectStore.openCursor().onsuccess = function(e) {
@@ -163,21 +163,25 @@
             }
         }
         
-//        if(recipeGallery.parentNode == null){
-//           
-//        } else {
+        recipeSearchDone = false;
+        
+        if(recipeGallery.parentNode == null || recipeGallery == null){
+           
+        } else {
         
             //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
             setUpCompleted.registerListener(function(val) {
                 console.log("Changed the value of setUpCompleted.a to " + val);
-                if(val == true){
+                if(val == true && !recipeSearchDone){
                     listOfIngredients = getListOfIngredientsAndSendToSearchRecipes(listOfIngredients);
                     //Ensure that setUpCompleted is set back to false right after the functions finish
                     setUpCompleted.a = false;
+                    recipeSearchDone = true;
                 }
             });
 
             setUpDatabase();
+        }
         
         
     </script>

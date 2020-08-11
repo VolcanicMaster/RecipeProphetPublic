@@ -229,10 +229,10 @@ while ($line !== false) {
         //Then, insert the ingredients into recipeIngredients
 
         //find the recipe_id this connection just added
-        //TODO this is probably the error
-        /*$sql = 'SELECT LAST_INSERT_ID();';
-        $recid = $conn->query($sql);*/
-        $recid = 10; //for testing purposes
+        //TODO make this actually set $recid to the recipe's id
+        //$sql = 'SELECT LAST_INSERT_ID();';
+        //$recid = $conn->query($sql);
+        $recid = mysqli_insert_id($conn);
 
         foreach($recings as $recing){
             $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
