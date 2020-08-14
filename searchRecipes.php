@@ -68,7 +68,7 @@ if($result->num_rows > 0){
 
 $recings = array();
 
-$arfile = file_get_contents("tempRecipeJSON/testRecipes.json");
+$arfile = file_get_contents("tempRecipeJSON/allrecipes100.json");
 
 $sep = "\r\n";
 $line = strtok($arfile, $sep);
@@ -126,7 +126,7 @@ while ($line !== false) {
             //TODO using newlen fucks it up. WHYYYYYYY?
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
-                    echo "<p>begin LIKE name fetch</p>";
+                    //echo "<p>begin LIKE name fetch</p>";
                     //overriding $name for a different use. could be ill-advised.
                     $name = strtolower($row["name"]);
 
@@ -141,20 +141,21 @@ while ($line !== false) {
                     $newlen = 0;
                     $corri = true; //tracks whether this ingredient may be correct based on content
                     foreach($exprow as $word){
-                        echo "<p>begin exprow word fetch, word: ". $word ."</p>";
+                        //echo "<p>begin exprow word fetch, word: ". $word ."</p>";
                         $pos = strpos($ing, $word);
                         if($pos === false){
                             //this is not the right ingredient, continue with the next iteration...
                             //$corri = false;
                             //break;
+                        } else {
+                            $newlen = $newlen + strlen($word);
                         }
-                        $newlen = $newlen + strlen($word);
-                        echo "<p>newlen increased to:". $newlen ."</p>";
+                        //echo "<p>newlen increased to:". $newlen ."</p>";
                     }
                     if($corri === true){
                         //if this ingredient is bigger than the previous max, replace it
                         if($newlen > $ingmax){
-                            echo "<p>newlen > ingmax</p>";
+                            //echo "<p>newlen > ingmax</p>";
                             //TODO prevent duplicate ingredients (If it's been used before, it can't be used now)
                             $ingmax = $newlen;
                             $ingnam = $row["name"];
