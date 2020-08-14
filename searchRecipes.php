@@ -115,28 +115,49 @@ while ($line !== false) {
             $sql = "SELECT name, id, tags FROM ingredients WHERE name LIKE '%" . $name . "%'";
             $result = $conn->query($sql);
 
-            //accept whichever result has the most characters/words and is contained within $ing
-            $ingmax = "";
+            //accept whichever result has the most matching characters/words and is contained within $ing
+            $ingmax = 0;
+            $ingnam = "";
             $imaxid = "";
             $imaxta = "";
             $imaxop = 0;
+            //TODO works fine on testRecipes for one recipe. Test if looping causes the issues? (FIX LOOPING ERROR FIRST?)
+            //TODO also remember to measure length by matching words instead of as a whole
+            //TODO using newlen fucks it up. WHYYYYYYY?
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
-                    $exprow = explode("",$row["name"]);
+                    echo "<p>begin LIKE name fetch</p>";
+                    //overriding $name for a different use. could be ill-advised.
+                    $name = strtolower($row["name"]);
+
+                    $pos = strpos($name, '(');
+
+                    while($pos !== false){
+                        $endpos = strpos($name, ')');
+                        $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+                        $pos = strpos($name, '(');
+                    }
+                    $exprow = explode(" ",$name);
+                    $newlen = 0;
                     $corri = true; //tracks whether this ingredient may be correct based on content
                     foreach($exprow as $word){
+                        echo "<p>begin exprow word fetch, word: ". $word ."</p>";
                         $pos = strpos($ing, $word);
                         if($pos === false){
                             //this is not the right ingredient, continue with the next iteration...
-                            $corri = false;
-                            break;
+                            //$corri = false;
+                            //break;
                         }
+                        $newlen = $newlen + strlen($word);
+                        echo "<p>newlen increased to:". $newlen ."</p>";
                     }
                     if($corri === true){
                         //if this ingredient is bigger than the previous max, replace it
-                        if(strlen($row["name"]) > strlen($ingmax)){
+                        if($newlen > $ingmax){
+                            echo "<p>newlen > ingmax</p>";
                             //TODO prevent duplicate ingredients (If it's been used before, it can't be used now)
-                            $ingmax = $row["name"];
+                            $ingmax = $newlen;
+                            $ingnam = $row["name"];
                             $imaxid = $row["id"];
                             $imaxta = $row["tags"];
                             //use parsing to determine whether this ingredient is optional
@@ -146,7 +167,7 @@ while ($line !== false) {
                         }
                     }
                 }
-                if($ingmax == ""){
+                if($ingnam == ""){
                     echo '<p>corri never returned true</p>';
                     continue;
                 }
@@ -157,7 +178,7 @@ while ($line !== false) {
 
             echo '<div>';
             echo '<p>JSON ingredient: ' . $ing . '</p>';
-            echo '<p>Closest ingredient: ' . $ingmax . '</p>';
+            echo '<p>Closest ingredient: ' . $ingnam . '</p>';
             echo '</div>';
             $ifound = true;
             $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
