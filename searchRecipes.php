@@ -66,8 +66,6 @@ if($result->num_rows > 0){
 
 //TODOlater put both the script and html for the tag selection into this php
 
-$recings = array();
-
 $arfile = file_get_contents("tempRecipeJSON/allrecipes100.json");
 
 $sep = "\r\n";
@@ -79,6 +77,8 @@ while ($line !== false) {
     echo '<div>';
     echo '<p>' . $linearray["title"] . '</p>';
     $ingarray = $linearray["ingredients"];
+    
+    $recings = array();
     
     $skipre = false;
     foreach($ingarray as $ing){
@@ -121,9 +121,7 @@ while ($line !== false) {
             $imaxid = "";
             $imaxta = "";
             $imaxop = 0;
-            //TODO works fine on testRecipes for one recipe. Test if looping causes the issues? (FIX LOOPING ERROR FIRST?)
-            //TODO also remember to measure length by matching words instead of as a whole
-            //TODO using newlen fucks it up. WHYYYYYYY?
+            //TODO works fine on testRecipes for one recipe. Test if looping causes the issues? (ramps up, earlier entries have less ingredients. weird. first one is completely correct as far as number of ingredients. Is it repeating ingredients from previous entries???)
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
                     //echo "<p>begin LIKE name fetch</p>";
@@ -148,6 +146,7 @@ while ($line !== false) {
                             //$corri = false;
                             //break;
                         } else {
+                            //TODO add the length of the matching letters, not the word (prevents unsalted butter -> salt)
                             $newlen = $newlen + strlen($word);
                         }
                         //echo "<p>newlen increased to:". $newlen ."</p>";
@@ -156,7 +155,7 @@ while ($line !== false) {
                         //if this ingredient is bigger than the previous max, replace it
                         if($newlen > $ingmax){
                             //echo "<p>newlen > ingmax</p>";
-                            //TODO prevent duplicate ingredients (If it's been used before, it can't be used now)
+                            //TODO prevent duplicate ingredients (not necessary with our algo?)
                             $ingmax = $newlen;
                             $ingnam = $row["name"];
                             $imaxid = $row["id"];
