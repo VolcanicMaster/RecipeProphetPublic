@@ -54,9 +54,11 @@ $dbings = array();
 if($result->num_rows > 0){
     echo '<p>if ingres</p>';
     while($row = $result->fetch_assoc()){
+        //echo '<p>'. $row["name"] .'</p>';
         $dbings[] = $row;
     }
 }
+//echo "<p>dbings length: ". count($dbings) ."</p>";
 
 //TODO only read the json file, and add ingredients manually based on what is invalid
 //TODO split the json file (auto?) into parts so it can actually run?
@@ -85,6 +87,12 @@ while ($line !== false) {
         $ing = strtolower($ing);
         $ifound = false;
         
+        $ingmax = 0;
+        $ingnam = "";
+        $imaxid = "";
+        $imaxta = "";
+        $imaxop = 0;
+        
         //check if $ing contains a valid ingredient
         
         //IF IT HAS A COLON, IGNORE THAT INGREDIENT (so it doesn't invalidate)
@@ -100,12 +108,13 @@ while ($line !== false) {
             $name = strtolower($ingrow["name"]);
 
             $pos = strpos($name, '(');
-
             while($pos !== false){
                 $endpos = strpos($name, ')');
                 $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                 $pos = strpos($name, '(');
             }
+            $name = trim($name);
+            
             // if the ingredient contains the dbingredient, query it to find the best match
             // if ingredient is wrong, just continue to the next row of the ingredients db
             if(strpos($ing,$name) === false){
@@ -116,12 +125,6 @@ while ($line !== false) {
             $result = $conn->query($sql);
 
             //accept whichever result has the most matching characters/words and is contained within $ing
-            $ingmax = 0;
-            $ingnam = "";
-            $imaxid = "";
-            $imaxta = "";
-            $imaxop = 0;
-            //TODO works fine on testRecipes for one recipe. Test if looping causes the issues? (ramps up, earlier entries have less ingredients. weird. first one is completely correct as far as number of ingredients. Is it repeating ingredients from previous entries???)
             if($result->num_rows > 0){
                 while($row = $result->fetch_assoc()){
                     //echo "<p>begin LIKE name fetch</p>";
@@ -129,12 +132,13 @@ while ($line !== false) {
                     $name = strtolower($row["name"]);
 
                     $pos = strpos($name, '(');
-
                     while($pos !== false){
                         $endpos = strpos($name, ')');
                         $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                         $pos = strpos($name, '(');
                     }
+                    $name = trim($name);
+                    
                     $exprow = explode(" ",$name);
                     $newlen = 0;
                     $corri = true; //tracks whether this ingredient may be correct based on content
@@ -142,22 +146,21 @@ while ($line !== false) {
                         //echo "<p>begin exprow word fetch, word: ". $word ."</p>";
                         $pos = strpos($ing, $word);
                         if($pos === false){
-                            //this is not the right ingredient, continue with the next iteration...
-                            //$corri = false;
-                            //break;
+                            //This is not the right ingredient, continue with the next iteration...
+                            $corri = false;
+                            break;
                         } else {
-                            //TODO add the length of the matching letters, not the word (prevents unsalted butter -> salt)
+                            //TODO: prevent unsalted butter -> salt. it's iterating through names like salt instead of names like butter. It should do both before accepting one. 
                             $newlen = $newlen + strlen($word);
                         }
-                        //echo "<p>newlen increased to:". $newlen ."</p>";
+                        echo "<p>newlen of ". $name ." is now:". $newlen ."</p>";
                     }
                     if($corri === true){
                         //if this ingredient is bigger than the previous max, replace it
                         if($newlen > $ingmax){
-                            //echo "<p>newlen > ingmax</p>";
-                            //TODO prevent duplicate ingredients (not necessary with our algo?)
                             $ingmax = $newlen;
                             $ingnam = $row["name"];
+                            echo "<p>newlen > ingmax. name: ". $ingnam ."</p>";
                             $imaxid = $row["id"];
                             $imaxta = $row["tags"];
                             //use parsing to determine whether this ingredient is optional
@@ -174,20 +177,19 @@ while ($line !== false) {
             } else {
                 echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
             }
+            //TODO don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
             //found the ingredient, break and move onto the next ingredient in the recipe
 
-            echo '<div>';
-            echo '<p>JSON ingredient: ' . $ing . '</p>';
-            echo '<p>Closest ingredient: ' . $ingnam . '</p>';
-            echo '</div>';
             $ifound = true;
-            $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
-            break;
         }
         //If no ingredient in the db matches the one in the json, print that it is invalid
         //output line number of invalid ingredients until we have a serviceable recipe database?
         if($ifound){
-            
+            echo '<div>';
+            echo '<p>JSON ingredient: ' . $ing . '</p>';
+            echo '<p>Closest ingredient: ' . $ingnam . '</p>';
+            echo '</div>';
+            $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
         } else {
             echo '<p> Invalid ingredient: ' . $ing . '</p>';
             //if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
