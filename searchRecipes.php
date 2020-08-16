@@ -7,7 +7,7 @@
 ?>
 <?php
         
-//TODO This alone DOES NOT work.
+//TODO This alone DOES NOT work to keep the page behind a login.
 //session_start();
 //
 //if (!isset($_SESSION['loggedin'])) {
@@ -150,7 +150,6 @@ while ($line !== false) {
                             $corri = false;
                             break;
                         } else {
-                            //TODO: prevent unsalted butter -> salt. it's iterating through names like salt instead of names like butter. It should do both before accepting one. 
                             $newlen = $newlen + strlen($word);
                         }
                         echo "<p>newlen of ". $name ." is now:". $newlen ."</p>";
@@ -177,8 +176,8 @@ while ($line !== false) {
             } else {
                 echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
             }
-            //TODO don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
-            //found the ingredient, break and move onto the next ingredient in the recipe
+            //don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
+            //found the ingredient
 
             $ifound = true;
         }
@@ -210,6 +209,7 @@ while ($line !== false) {
         $name = $linearray["title"];
 
         $tags = "";
+        //TODO read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
         //TODO: before DB UPLOAD, add tags to every ingredient in the database
         // assign tags based on the included ingredients (ingredients should have tags?)
         // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
@@ -245,14 +245,12 @@ while ($line !== false) {
         $tags = implode(',',array_unique(explode(',', $tags)));
 
         echo "<p>INSERTING...</p>";
-        //TODO stop the code as a whole from inserting the same r/ri twice, use echos to identify why?
         $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
         $conn->query($sql);
 
         //Then, insert the ingredients into recipeIngredients
 
         //find the recipe_id this connection just added
-        //TODO make this actually set $recid to the recipe's id
         //$sql = 'SELECT LAST_INSERT_ID();';
         //$recid = $conn->query($sql);
         $recid = mysqli_insert_id($conn);
