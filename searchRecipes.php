@@ -209,7 +209,6 @@ while ($line !== false) {
         $name = $linearray["title"];
 
         $tags = "";
-        //TODO read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
         //TODO: before DB UPLOAD, add tags to every ingredient in the database
         // assign tags based on the included ingredients (ingredients should have tags?)
         // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
@@ -235,14 +234,52 @@ while ($line !== false) {
         if(strpos($lname,"indian") !== false){
             $tags = $tags . "Indian,";
         }
-        
+        //read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
+        $vegan = true;
+        $lacfree = true;
+        $peanutf = true;
         foreach($recings as $recing){
+            if(strpos($recing["tags"],"NotVegan") !== false){
+                $vegan = false;
+                continue;
+            }
+            if(strpos($recing["tags"],"Lactose") !== false){
+                $lacfree = false;
+                continue;
+            }
+            if(strpos($recing["tags"],"Peanut") !== false){
+                $peanutf = false;
+                continue;
+            }
             $tags = $tags . $recing["tags"] . ",";
         }
-        //remove trailing comma
-        $tags = rtrim($tags, ",");
+        //TODO remove multiple commas in a row (this is pretty simple to do in post, but why does it happen at all?)
+        if($vegan){
+            $tags = $tags . "Vegan,";
+        }
+        if($lacfree){
+            $tags = $tags . "Lactose-Free,";
+        }
+        if($peanutf){
+            $tags = $tags . "Peanut-Free,";
+        }
+        //remove trailing comma(s?)
+        $tags = trim($tags, ",");
+        echo "<p>tags: ". $tags ."</p>";
+        //remove repeated commas
+        $pos = strpos($tags,",,");
+        while($pos !== false){
+            $tags = str_replace(",,",",",$tags);
+            //iterate
+            $pos = strpos($tags,",,");
+        }
         //remove duplicate tags
         $tags = implode(',',array_unique(explode(',', $tags)));
+        echo "<p>tags after eximplode: ". $tags ."</p>";
+        //may not be necessary, but clean?
+        $tags = trim($tags, ",");
+        //add quotes within the string (just change the parsing algo)
+        //$tags = '' . $tags . '';
 
         echo "<p>INSERTING...</p>";
         $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
