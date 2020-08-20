@@ -44,9 +44,9 @@ $id = $dom->getElementById('my_id');*/
 echo '<div id="newRecipeProphetRecipeGallery">';
 
 //searchForRecipes that returns a sorted list of recipes
-//TODO query recipeDatabase so that it returns only the recipes that fit the constraints (ease,weight for now)
 
-
+//TODO uncomment this block when you want to add json recipes to db. 
+/*
 //Query for ingredients
 $sql = "SELECT name FROM ingredients;";
 $result = $conn->query($sql);
@@ -61,12 +61,9 @@ if($result->num_rows > 0){
 //echo "<p>dbings length: ". count($dbings) ."</p>";
 
 //TODO only read the json file, and add ingredients manually based on what is invalid
-//TODO split the json file (auto?) into parts so it can actually run?
+//TODO split the json file into parts so it can actually run? (like allrecipes100.json)
 
-//TODO put code here that reads the split json files and submits valid recipes to the database
-//(will only be run once when the program is completed)
-
-//TODOlater put both the script and html for the tag selection into this php
+//TODO put both the script and html for the tag selection into this php
 
 $arfile = file_get_contents("tempRecipeJSON/allrecipes100.json");
 
@@ -253,7 +250,6 @@ while ($line !== false) {
             }
             $tags = $tags . $recing["tags"] . ",";
         }
-        //TODO remove multiple commas in a row (this is pretty simple to do in post, but why does it happen at all?)
         if($vegan){
             $tags = $tags . "Vegan,";
         }
@@ -278,7 +274,7 @@ while ($line !== false) {
         echo "<p>tags after eximplode: ". $tags ."</p>";
         //may not be necessary, but clean?
         $tags = trim($tags, ",");
-        //add quotes within the string (just change the parsing algo)
+        //add quotes within the string (TODO just change the parsing algo)
         //$tags = '' . $tags . '';
 
         echo "<p>INSERTING...</p>";
@@ -301,7 +297,7 @@ while ($line !== false) {
     # iterate
     $line = strtok( $sep );
 }
-
+*/
 
 // Query that selects recipes which only contain ingredients from the constraint list
 $sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
