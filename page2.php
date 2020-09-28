@@ -98,9 +98,10 @@
 
 
 
-        <div class="container">
-
+        <div id="rPRecipeContainer" class="container">
+<!--TODO FAILURE: send the entire container in the xmlhttprequest to see if tags work? -->
             <div><!-- Filter --><div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div><div><center><a href="keepSearchingErrorPrompt.php">Keep Searching for Recipes</a></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div><div id="recipeProphetRecipeGallery"><!--TODO optional: Create loading circle here--></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+        
         </div>
 
     </section>
@@ -109,10 +110,26 @@
     <?php
         include "scripts/dbConnect.php"
     ?>
+    <?php
+            //log php output via js
+            function console_log($output, $with_script_tags = true) {
+            $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . ');';
+                if ($with_script_tags) {
+                    $js_code = '<script>' . $js_code . '</script>';
+                }
+                echo $js_code;
+            }    
+    
+            //$test_string = '\'Egg\',\'Mozzarella (Cheese)\'';
+            //escaping is not necessary / does not work if it's already escaped
+            //$test_string = $conn->real_escape_string($test_string);
+            //console_log($test_string);
+    ?>
     <script src="scripts/databaseManipulator.js"></script>
     <!--<script src="scripts/recipeSearch.js"></script>-->
     <script>
         const recipeGallery = document.getElementById('recipeProphetRecipeGallery');
+        //const recipeGallery = document.getElementById('rPRecipeContainer');
 
         //remove all existing children from recipeGallery
         /*while (recipeGallery.firstChild) {
@@ -134,6 +151,7 @@
                     if(cursor) {
                         console.log("entered if cursor");
                         //add this ingredient to an easily accessible array
+                        //surround each ingredient with quotes (necessary for mySQL query)
                         listOfIngredients.push(cursor.value.name);
                         cursor.continue();
                     } else {
@@ -146,9 +164,11 @@
                                 console.log("entered onreadystatechange");
                                 let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
                                 let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
+                                //let newRecipeGallery = doc.getElementById("rPRecipeContainer");
                                 recipeGallery.parentNode.replaceChild(newRecipeGallery, recipeGallery);
-
+                                
                                 //TODO tags are present on the recipe elements, but not as buttons
+                                //TODO use document.ready or something like that for the tag code?
 
                                 console.log("ended onreadystatechange");
                               }

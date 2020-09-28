@@ -15,11 +15,35 @@
 //    exit; 
 //}
 
+        //TODO there could be an issue with the length of $data
+        
 $data = file_get_contents( "php://input" ); //$data is now the string '[1,2,3]';
 
 $data = json_decode( $data ); //$data is now a php array array(1,2,3)
 
-$imploded_data = implode( "', '", $data);
+//for each ingredient, add slash quotes around it.
+/*foreach($data as &$ing){
+    $ing = '\'' . $ing . '\'';
+}*/
+/*
+foreach($data as &$ing){
+    $ing = "\'" . $ing . "\'";
+}*/
+
+//$imploded_data = implode( "', '", $data); //original
+//$imploded_data = implode( '\', \'', $data);
+//$imploded_data = implode( "\", \"", $data);
+//$imploded_data = implode( "\', \'", $data);
+//$imploded_data = implode( ", ", $test_array); //
+
+//TODO the problem IS with implosion itself. But what? Test further.
+//TODO implode test_string so you know what it is.
+//$test_array = array("Egg","Mozzarella (Cheese)");
+//$imploded_data = implode( "\', \'", $test_array);
+//$imploded_data = "\'" . $imploded_data .  "\'";
+
+$imploded_data = implode( "\', \'", $data);
+$imploded_data = "\'" . $imploded_data .  "\'";
 
 /*
 // Create a new DOM Document 
@@ -40,6 +64,15 @@ $attr = $element->setAttributeNode(
 $element->setIDAttribute('id', true); 
 
 $id = $dom->getElementById('my_id');*/
+
+// echo everthing in "rPRecipeContainer" that comes before recipeProphetRecipeGallery
+/*
+<div id="rPRecipeContainer" class="container">
+            <div><!-- Filter --><div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div><div><center><a href="keepSearchingErrorPrompt.php">Keep Searching for Recipes</a></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div>
+*/
+/*
+echo '<div id="rPRecipeContainer" class="container">';
+echo '<div><!-- Filter --><div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div><div><center><a href="keepSearchingErrorPrompt.php">Keep Searching for Recipes</a></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div>';*/
 
 echo '<div id="newRecipeProphetRecipeGallery">';
 
@@ -63,7 +96,7 @@ if($result->num_rows > 0){
 //TODO only read the json file, and add ingredients manually based on what is invalid
 //TODO split the json file into parts so it can actually run? (like allrecipes100.json)
 
-//TODO put both the script and html for the tag selection into this php
+//TODO put both the script and html for the tag selection into this php ("rPRecipeContainer"?)
 
 $arfile = file_get_contents("tempRecipeJSON/allrecipes100.json");
 
@@ -274,8 +307,6 @@ while ($line !== false) {
         echo "<p>tags after eximplode: ". $tags ."</p>";
         //may not be necessary, but clean?
         $tags = trim($tags, ",");
-        //add quotes within the string (TODO just change the parsing algo)
-        //$tags = '' . $tags . '';
 
         echo "<p>INSERTING...</p>";
         $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
@@ -299,8 +330,23 @@ while ($line !== false) {
 }
 */
 
+//TODO THE PROBLEM IS: not all ids between the first and last are present. 101 recipes but after 1,2,3 it jumps to 18__.
+//TODO 1841 repeats ingredients, as does 1835, both of which have no egg. 1830 repeats ing 13 only, no egg.
+//TODO not displaying recipes at all. Could have to do with our additions of '\
+//Our code has no issue displaying large amounts of recipes (tested with 100). Though eventually we should limit the query
+
 // Query that selects recipes which only contain ingredients from the constraint list
-$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
+//$conn->real_escape_string($imploded_data);
+$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );"; //
+//$test_string = '\'Egg\',\'Mozzarella (Cheese)\''; //outermost quote type doesn't matter if it's concatenated later
+//test_string is already escaped, real escape string returns the same thing.
+
+//$sql = "CALL SRecBasedOnIng('" . $test_string . "');"; //This does not work
+//$sql = "SELECT * FROM recipes;"; //This works
+//$sql = "CALL SRecBasedOnIng(\"\'Egg\',\'Mozzarella (Cheese)\'\");"; //THIS LINE WORKS!
+//$sql = "CALL SRecBasedOnIng(\"" . $test_string . "\");"; //THIS WORKS!
+//$sql = "CALL SRecBasedOnIng( \"" . $imploded_data . "\" );"; //This doesn't work? maybe because of the implosion code?
+//$sql = 'CALL SRecBasedOnIng( \"' . $imploded_data . '\" );';
 
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
@@ -310,9 +356,9 @@ if ($result->num_rows > 0) {
         /*
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
         */
-        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags=' 
+        echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="' 
             . $row["tags"] 
-            . ' onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
+            . '" onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
         echo '<div class="crop">';
         echo '<img src="' . $row["imglink"] . '" alt="" title="">';
         echo '<span class="icon-focus"></span>';
@@ -328,6 +374,15 @@ if ($result->num_rows > 0) {
 }
 
 echo '</div>';
+
+//echo everthing in "rPRecipeContainer" that comes after recipeProphetRecipeGallery
+/*
+</div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+        </div>
+        */
+/*
+echo '</div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+        </div>';*/
 
 ?>
 

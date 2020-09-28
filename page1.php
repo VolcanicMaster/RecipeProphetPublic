@@ -9,7 +9,7 @@
   <meta name="description" content="Web Site Generator Description">
   
   
-  <title>Example Prompt</title>
+  <title>Ingredient Prompt</title>
   <link rel="stylesheet" href="assets/web/assets/mobirise-icons/mobirise-icons.css">
   <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
@@ -65,18 +65,27 @@
     
 
     
-
     <div class="container align-center">
+        <div class="container align-center">
+            <div class="row justify-content-md-center">
+                <div class="mbr-white col-md-10">
+
+                    <image width="50" src="assets/images/undo.png" onclick="history.back()"></image>
+
+                    <h3 id="prompt"class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-2">
+                        Do you have Tomato?</h3>
+
+                    <div class="mbr-section-btn"><a id="yesBtn" class="btn btn-md btn-info display-4" onclick="">YES</a>
+                        <a id="noBtn" class="btn btn-md btn-white display-4" onclick="">NO</a></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class= "container align-bottom" style="position: absolute; bottom: 0;">
         <div class="row justify-content-md-center">
             <div class="mbr-white col-md-10">
-                
-                <image width="50" src="assets/images/undo.png" onclick="history.back()"></image>
-                
-                <h3 class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-2">
-                    Do you have Tomato?</h3>
-                
-                <div class="mbr-section-btn"><a class="btn btn-md btn-info display-4" href="page2.php">YES</a>
-                    <a class="btn btn-md btn-white display-4" href="page2.php">NO</a></div>
+                <div class="mbr-section-btn"><a id="justGiveMeRecipesBtn" class="btn btn-md btn-primary display-4" href="page2.php">JUST GIVE ME RECIPES</a><a id="promptCounter" class="mbr-text pb-3 mbr-fonts-style display-5">Prompt 1/3</a></div>
             </div>
         </div>
     </div>
