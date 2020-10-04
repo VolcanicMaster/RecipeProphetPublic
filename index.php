@@ -196,6 +196,8 @@
                                 generates ingredients list from database, 
                                 filterFunction limits number of ingredients shown at once
 
+                                TODO make textarea smaller. maybe change it from a textarea to something else.
+                                
                                 TODO use all words in parentheses for display
 
                                 TODO include ingredients like Salt, Olive Oil, Water by default
@@ -204,14 +206,13 @@
                         -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
-                            <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','ingredientDropdown')"></textarea>
+                            <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;"></textarea>
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
                               <div id="ingredientDropdown" class="dropdown-content">
                                 
                               </div>
                             </div>
-                            <ul name="ingredients" id="ingredients">Ingredients: </ul>
                             
                             <div class="dropdown">
                               <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Difficulty Preference</button>
@@ -242,6 +243,10 @@
                             
                         </div>
                         <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-primary btn-form display-4">FIND RECIPES!</button></a></div>
+                            
+                            <ul name="ingredients" id="ingredients">Ingredients: </ul>
+                            
+                            
                         
                     </div>
                 </div><!---Formbuilder Form--->

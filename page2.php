@@ -151,7 +151,6 @@
                     if(cursor) {
                         console.log("entered if cursor");
                         //add this ingredient to an easily accessible array
-                        //surround each ingredient with quotes (necessary for mySQL query)
                         listOfIngredients.push(cursor.value.name);
                         cursor.continue();
                     } else {
