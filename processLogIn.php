@@ -1,5 +1,6 @@
 <?php
 include "scripts/dbConnect.php";
+session_start();
 //$data = file_get_contents( "php://input" ); //gets string from xmlhttp, does it work for retrieving form POST?
 if ( isset( $_POST['submit'] ) ){
     //retrieve username and password from form
@@ -26,9 +27,9 @@ if ( isset( $_POST['submit'] ) ){
                 $_SESSION['loggedin'] = TRUE;
                 $_SESSION['name'] = $_POST['username'];
                 $_SESSION['id'] = $id;
-                //echo 'Welcome ' . $_SESSION['name'] . '!';
-                header('Location: index.php');
-                exit;
+                echo 'Welcome ' . $_SESSION['name'] . '!';
+                //header('Location: index.php');
+                //exit;
             } else {
                 echo 'Incorrect password!';
             }

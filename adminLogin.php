@@ -1,5 +1,5 @@
 <body>
-    <form action="/scripts/processLogIn.php" method="post" enctype="multipart/form-data">
+    <form action="processLogIn.php" method="post" enctype="multipart/form-data">
         <label>Username: </label>
         <input type=text name="username" value>
         <label>Password: </label>
