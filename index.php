@@ -197,8 +197,9 @@
                                 filterFunction limits number of ingredients shown at once
 
                                 TODO make textarea smaller. maybe change it from a textarea to something else.
+                                TODO make the dropdown appear closer to the textarea.
                                 
-                                TODO use all words in parentheses for display
+                                TODO use all words in parentheses for display?
 
                                 TODO include ingredients like Salt, Olive Oil, Water by default
                                     OR add a button that adds common ingredients
