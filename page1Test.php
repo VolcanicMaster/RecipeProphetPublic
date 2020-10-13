@@ -113,6 +113,9 @@
     ?>
     <script src="scripts/databaseManipulator.js"></script>
     <script>
+        //clear the onload function that is set by default in databaseManipulator
+        //instead, we need a version of setUpDatabase without the displayDatas.
+        window.onload = setUpDatabaseWithoutDisplay; 
         /*
         //TODO get ingredients from indexeddb
         var listOfIngredients = []; 
@@ -158,7 +161,7 @@
         var unavailables = []; //TODO make unavailables session-tied (indexeddb)
         
         //TODO do calculation to determine what the best ingredient to ask about is. 
-        //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10 if no ings were entered?) (the end result of the calculation would be an array to loop through)
+        //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
         
         //TODO for now, select random ingredients from the database
         

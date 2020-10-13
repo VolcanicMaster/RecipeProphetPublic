@@ -101,7 +101,7 @@ function selectElementFromTextArea(id,dropdownID,textAreaID){
     textArea = document.getElementById(textAreaID);
 
     // add ingredients to database
-    addData(selection.textContent);
+    addData(selection.textContent, true);
 
     textArea.value = "";
     $(dropdown).toggle("show");

@@ -40,7 +40,7 @@ setUpCompleted = {
 
 
 // Define the addData() function
-  function addData(ingredient) {
+  function addData(ingredient, withDisplay) {
     // prevent default - we don't want the form to submit in the conventional way
     //e.preventDefault();
     console.log("Begin call to addData");
@@ -67,7 +67,9 @@ setUpCompleted = {
       console.log('Transaction completed: database modification finished.');
 
       // update the display of data to show the newly added item, by running displayData() again.
-      displayData();
+        if(withDisplay){
+            displayData();
+        }
     };
 
     transaction.onerror = function() {
@@ -160,6 +162,20 @@ setUpCompleted = {
         listItem.textContent = 'No ingredients selected.';
         list.appendChild(listItem);
       }
+    };
+  }
+
+//testing if deleteData works as intended
+function deleteData(ingredient) {
+
+    // open a database transaction and delete the task, finding it using the id we retrieved above
+    let transaction = db.transaction(['notes_os'], 'readwrite');
+    let objectStore = transaction.objectStore('notes_os');
+    let request = objectStore.delete(ingredient);
+
+    // report that the data item has been deleted
+    transaction.oncomplete = function() {
+      console.log('Data ' + ingredient + ' deleted.');
     };
   }
 
@@ -257,6 +273,50 @@ function setUpDatabase() {
     }
   }
   */
+
+};
+
+function setUpDatabaseWithoutDisplay() {
+  // Open our database; it is created if it doesn't already exist
+  // (see onupgradeneeded below)
+  let request = window.indexedDB.open('notes_db', 1);
+
+  // onerror handler signifies that the database didn't open successfully
+  request.onerror = function() {
+    console.log('Database failed to open');
+  };
+
+  // onsuccess handler signifies that the database opened successfully
+  request.onsuccess = function() {
+    console.log('Database opened succesfully');
+
+    // Store the opened database object in the db variable. This is used a lot below
+    db = request.result;
+
+      //TODO remove displayData from all aspects of this setup
+    //displayData();
+      
+    // send a message to other javascript that setUpDatabase is completed
+    setUpCompleted.a = true;
+  };
+
+  // Setup the database tables if this has not already been done
+  request.onupgradeneeded = function(e) {
+
+    // Grab a reference to the opened database
+    let db = e.target.result;
+
+    // Create an objectStore to store our notes in (basically like a single table)
+    // including a auto-incrementing key
+    let objectStore = db.createObjectStore('notes_os', { keyPath: 'id', autoIncrement:true });
+
+    // Define what data items the objectStore will contain
+    objectStore.createIndex('name', 'name', { unique: true });
+    // objectStore.createIndex('owned', 'owned', { unique: false });
+
+    console.log('Database setup complete');
+  };
+
 
 };
 
