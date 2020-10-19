@@ -54,7 +54,7 @@ setUpCompleted = {
     // call an object store that's already been added to the database
     let objectStore = transaction.objectStore('notes_os'); 
       
-    // Make a request to add our newItem object to the object store
+    // Make a request to add our newItem object to the object store      
     var request = objectStore.add(newItem);
     request.onsuccess = function() {
       // Clear the form, ready for adding the next entry
@@ -168,15 +168,39 @@ setUpCompleted = {
 //testing if deleteData works as intended
 function deleteData(ingredient) {
 
-    // open a database transaction and delete the task, finding it using the id we retrieved above
+    // open a database transaction and delete the task, finding it by iterating with a cursor and using that id
     let transaction = db.transaction(['notes_os'], 'readwrite');
     let objectStore = transaction.objectStore('notes_os');
-    let request = objectStore.delete(ingredient);
-
+    
     // report that the data item has been deleted
     transaction.oncomplete = function() {
       console.log('Data ' + ingredient + ' deleted.');
     };
+    
+    objectStore.openKeyCursor().onsuccess = function(e) {
+        console.log('Entered openKeyCursor.onsuccess');
+      // Get a reference to the cursor
+      let cursor = e.target.result;
+
+      // If there is still another data item to iterate through, keep running this code
+      if(cursor) {
+          console.log('If cursor');
+          objectStore.get(cursor.key).onsuccess = function(ev) {
+              var req = ev.target.result;
+              console.log('Entered get primaryKey, req = ' + req.name);
+              if(req.name == (ingredient)){
+                  console.log('Deleting id at cursor');
+                 let request = objectStore.delete(cursor.key);
+              }
+              // Iterate to the next item in the cursor
+              cursor.continue();
+          }
+      } else {
+        // cursor is done
+      }
+    };
+
+    
   }
 
 function setUpDatabase() {

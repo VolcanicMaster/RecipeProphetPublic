@@ -116,7 +116,7 @@
         //clear the onload function that is set by default in databaseManipulator
         //instead, we need a version of setUpDatabase without the displayDatas.
         window.onload = setUpDatabaseWithoutDisplay; 
-        /*
+        
         //TODO get ingredients from indexeddb
         var listOfIngredients = []; 
         var indexedDBGetDone = false;
@@ -146,8 +146,11 @@
                 
             }
         });
-
-        setUpDatabase();//*/
+        
+        
+        
+        
+        
         
         
         
@@ -187,7 +190,8 @@
         //TODO in order to send the information to list of ingredients, we should send the new ingredients to the indexedDB after each button click?
         function onYes(ing){
             //add the ingredient to list of ingredients
-            
+            //TODO test this, it looks like it's working!
+            addData(ing, false);
             
             //remove the ingredient from the session-tied NOT AVAILABLE list 
             if(unavailables.indexOf(ing) != -1 ){
@@ -199,10 +203,13 @@
         }
         function onNo(ing){
             //remove the ingredient from list of ingredients
-            
+            //TODO test this, it doesn't appear to delete correctly
+            deleteData(ing);
             
             //add the ingredient to the session-tied NOT AVAILABLE list (so it doesn't get prompted again in a later set)
-            unavailables.push(ing);
+            if(unavailables.indexOf(ing) == -1 ){
+                unavailables.push(ing);
+            }
             
             //continue to the next prompt
             askAboutIng();
@@ -231,7 +238,7 @@
         
         //TODO remove this, make it wait until the info from the database has been selected and the calculations have been done
         //call the first prompt
-        askAboutIng();
+        //askAboutIng();
     </script>
     <?php
 
