@@ -121,6 +121,14 @@
         var listOfIngredients = []; 
         var indexedDBGetDone = false;
         
+        const prompt = document.getElementById('prompt');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const promptCounter = document.getElementById('promptCounter');        
+        
+        var ingsToPrompt = ['Tomato', 'Mozzarella (Cheese)'];//var ingsToPrompt = [];
+        var unavailables = []; //TODO make unavailables session-tied (indexeddb)
+        
         //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
         setUpCompleted.registerListener(function(val) {
             if(val == true && !indexedDBGetDone){
@@ -139,8 +147,8 @@
                         //Ensure that setUpCompleted is set back to false right after the functions finish
                         setUpCompleted.a = false;
                         indexedDBGetDone = true;
-                        //call the first prompt
-                        askAboutIng();
+                        //do prompt setup, which ends by calling the first prompt
+                        ingPromptSetup();
                     }
                 }
                 
@@ -148,42 +156,48 @@
         });
         
         
+        function ingPromptSetup(){
+            
+            //TODO do calculation to determine what the best ingredient to ask about is. 
+            //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
+
+            //TODO for now, select random ingredients from the database
+
+            //generate full list of ingredients from database
+            //TODO something here is causing an error.
+            <?php
+                $dbIngs = array();
+                $dbTags = array();
+                $sql = "SELECT name,tags FROM ingredients;";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    // output data of each row
+                    while($row = $result->fetch_assoc()) {       
+                        array_push($dbIngs,($row["name"]));
+                        array_push($dbTags,($row["tags"]));
+                    }
+                }
+            ?>
+            /*//pass to javascript
+            var dbIngs = <?php echo json_encode($dbIngs); ?>;
+            var dbTags = <?php echo json_encode($dbTags); ?>;
+            //remove those that are already on the indexeddb at this point
+            for(int j = 0; j < listOfIngredients.length; j++;){
+                delete dbIngs[dbIngs.indexOf(listOfIngredients[j])];
+            }*/
+
+            //TODOLATER remove those that have tags which are incompatible with current settings
+            
+            ingsToPrompt = ['Parmesan (Cheese)','Apple'];
+            
+            askAboutIng();
+        }
         
         
         
         
         
         
-        const prompt = document.getElementById('prompt');
-        const yesBtn = document.getElementById('yesBtn');
-        const noBtn = document.getElementById('noBtn');
-        const promptCounter = document.getElementById('promptCounter');        
-        
-        var i = 0;
-        var ingsToPrompt = ['Tomato', 'Mozzarella (Cheese)'];//var ingsToPrompt = [];
-        var unavailables = []; //TODO make unavailables session-tied (indexeddb)
-        
-        //TODO do calculation to determine what the best ingredient to ask about is. 
-        //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
-        
-        //TODO for now, select random ingredients from the database
-        
-        //generate full list of ingredients from database
-        //TODO something here is causing an error.
-        /*$dbIngs = [];
-        $dbTags = [];
-        $sql = "SELECT * FROM ingredients;";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {       
-                $dbIngs.push($row["name"]);
-                $dbTags.push($row["tags"]);
-            }
-        }*/
-        //TODO remove those that are already on the indexeddb at this point
-        
-        //TODOLATER remove those that have tags which are incompatible with current settings
         
         
         //define function that happens on click for Yes and No
@@ -214,6 +228,8 @@
             //continue to the next prompt
             askAboutIng();
         }
+        
+        var i = 0;
         
         function askAboutIng(){
             //check if ings has been iterated through
