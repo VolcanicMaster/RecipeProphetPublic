@@ -164,7 +164,6 @@
             //TODO for now, select random ingredients from the database
 
             //generate full list of ingredients from database
-            //TODO something here is causing an error.
             <?php
                 $dbIngs = array();
                 $dbTags = array();
@@ -178,13 +177,14 @@
                     }
                 }
             ?>
-            /*//pass to javascript
+            //pass to javascript
             var dbIngs = <?php echo json_encode($dbIngs); ?>;
             var dbTags = <?php echo json_encode($dbTags); ?>;
             //remove those that are already on the indexeddb at this point
-            for(int j = 0; j < listOfIngredients.length; j++;){
+            var j;
+            for(j = 0; j < listOfIngredients.length; j++){
                 delete dbIngs[dbIngs.indexOf(listOfIngredients[j])];
-            }*/
+            }
 
             //TODOLATER remove those that have tags which are incompatible with current settings
             
