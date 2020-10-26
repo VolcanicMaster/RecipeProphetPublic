@@ -126,7 +126,7 @@
         const noBtn = document.getElementById('noBtn');
         const promptCounter = document.getElementById('promptCounter');        
         
-        var ingsToPrompt = ['Tomato', 'Mozzarella (Cheese)'];//var ingsToPrompt = [];
+        var ingsToPrompt = [];//var ingsToPrompt = [];
         var unavailables = []; //TODO make unavailables session-tied (indexeddb)
         
         //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
@@ -143,7 +143,7 @@
                         listOfIngredients.push(cursor.value.name);
                         cursor.continue();
                     } else {
-                        //TODO do something on completion
+                        //do something on completion
                         //Ensure that setUpCompleted is set back to false right after the functions finish
                         setUpCompleted.a = false;
                         indexedDBGetDone = true;
@@ -156,13 +156,16 @@
         });
         
         
-        function ingPromptSetup(){
-            
-            //TODO do calculation to determine what the best ingredient to ask about is. 
+        //use this to delete from array based on value
+        function arrayRemove(arr, value) { return arr.filter(function(ele){ return ele != value; });}
+        
+        ///
+        /////TODO do calculation to determine what the best ingredient to ask about is. 
             //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
 
             //TODO for now, select random ingredients from the database
-
+        ///
+        function ingPromptSetup(){
             //generate full list of ingredients from database
             <?php
                 $dbIngs = array();
@@ -182,13 +185,32 @@
             var dbTags = <?php echo json_encode($dbTags); ?>;
             //remove those that are already on the indexeddb at this point
             var j;
+            var dbIngsInitCount = dbIngs.length; //number of ingredients in the database
+            var indDBIngCount = 0; //number of ingredients in the indexeddb
             for(j = 0; j < listOfIngredients.length; j++){
-                delete dbIngs[dbIngs.indexOf(listOfIngredients[j])];
+                var indexOnIndexedDB = dbIngs.indexOf(listOfIngredients[j]);
+                if(indexOnIndexedDB != -1){
+                    indDBIngCount++;
+                    dbIngs.splice(indexOnIndexedDB,1);
+                }
+            }
+            //determine how many prompts to give based on the percent coverage of the ingredients
+            var indDBOffset = 20;
+            var totalOffset = 1;
+            var numPrompts = Math.floor((dbIngsInitCount) / (indDBIngCount + indDBOffset)) + totalOffset;
+            //var numPrompts = 5; // for testing
+            //calculate what to prompt
+            for(j = 0; j < numPrompts; j++){
+                //select an ingredient from dbIngs
+                var indexOfSelection = Math.floor(Math.random() * dbIngs.length);
+                var selectedIng = dbIngs[indexOfSelection];
+                ingsToPrompt.push(selectedIng);
+                dbIngs.splice(indexOfSelection,1);
             }
 
             //TODOLATER remove those that have tags which are incompatible with current settings
             
-            ingsToPrompt = ['Parmesan (Cheese)','Apple'];
+            //ingsToPrompt = ['Parmesan (Cheese)','Apple']; //testing if the code runs
             
             askAboutIng();
         }
