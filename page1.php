@@ -27,7 +27,7 @@
         header('Location: page1Test.php');
         exit; 
     } else {
-        //TODO it isn't detecting logins correctly? 
+        
     }
     ?>
   
@@ -109,10 +109,21 @@
     ?>
     <script src="scripts/databaseManipulator.js"></script>
     <script>
-        /*
+        //clear the onload function that is set by default in databaseManipulator
+        //instead, we need a version of setUpDatabase without the displayDatas.
+        window.onload = setUpDatabaseWithoutDisplay; 
+        
         //TODO get ingredients from indexeddb
         var listOfIngredients = []; 
         var indexedDBGetDone = false;
+        
+        const prompt = document.getElementById('prompt');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const promptCounter = document.getElementById('promptCounter');        
+        
+        var ingsToPrompt = [];//var ingsToPrompt = [];
+        var unavailables = []; //TODO make unavailables session-tied (indexeddb)
         
         //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
         setUpCompleted.registerListener(function(val) {
@@ -128,59 +139,91 @@
                         listOfIngredients.push(cursor.value.name);
                         cursor.continue();
                     } else {
-                        //TODO do something on completion
+                        //do something on completion
                         //Ensure that setUpCompleted is set back to false right after the functions finish
                         setUpCompleted.a = false;
                         indexedDBGetDone = true;
-                        //call the first prompt
-                        askAboutIng();
+                        //do prompt setup, which ends by calling the first prompt
+                        ingPromptSetup();
                     }
                 }
                 
             }
         });
+        
+        
+        //use this to delete from array based on value
+        function arrayRemove(arr, value) { return arr.filter(function(ele){ return ele != value; });}
+        
+        ///
+        /////TODO do calculation to determine what the best ingredient to ask about is. 
+            //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
 
-        setUpDatabase();//*/
-        
-        
-        
-        const prompt = document.getElementById('prompt');
-        const yesBtn = document.getElementById('yesBtn');
-        const noBtn = document.getElementById('noBtn');
-        const promptCounter = document.getElementById('promptCounter');        
-        
-        var i = 0;
-        var ingsToPrompt = ['Tomato', 'Mozzarella (Cheese)'];//var ingsToPrompt = [];
-        var unavailables = []; //TODO make unavailables session-tied (indexeddb)
-        
-        //TODO do calculation to determine what the best ingredient to ask about is. 
-        //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10 if no ings were entered?) (the end result of the calculation would be an array to loop through)
-        
-        //TODO for now, select random ingredients from the database
-        
-        //generate full list of ingredients from database
-        //TODO something here is causing an error.
-        /*$dbIngs = [];
-        $dbTags = [];
-        $sql = "SELECT * FROM ingredients;";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {       
-                $dbIngs.push($row["name"]);
-                $dbTags.push($row["tags"]);
+            //TODO for now, select random ingredients from the database
+        ///
+        function ingPromptSetup(){
+            //generate full list of ingredients from database
+            <?php
+                $dbIngs = array();
+                $dbTags = array();
+                $sql = "SELECT name,tags FROM ingredients;";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    // output data of each row
+                    while($row = $result->fetch_assoc()) {       
+                        array_push($dbIngs,($row["name"]));
+                        array_push($dbTags,($row["tags"]));
+                    }
+                }
+            ?>
+            //pass to javascript
+            var dbIngs = <?php echo json_encode($dbIngs); ?>;
+            var dbTags = <?php echo json_encode($dbTags); ?>;
+            //remove those that are already on the indexeddb at this point
+            var j;
+            var dbIngsInitCount = dbIngs.length; //number of ingredients in the database
+            var indDBIngCount = 0; //number of ingredients in the indexeddb
+            for(j = 0; j < listOfIngredients.length; j++){
+                var indexOnIndexedDB = dbIngs.indexOf(listOfIngredients[j]);
+                if(indexOnIndexedDB != -1){
+                    indDBIngCount++;
+                    dbIngs.splice(indexOnIndexedDB,1);
+                }
             }
-        }*/
-        //TODO remove those that are already on the indexeddb at this point
+            //determine how many prompts to give based on the percent coverage of the ingredients
+            var indDBOffset = 20;
+            var totalOffset = 1;
+            var numPrompts = Math.floor((dbIngsInitCount) / (indDBIngCount + indDBOffset)) + totalOffset;
+            //var numPrompts = 5; // for testing
+            //calculate what to prompt
+            for(j = 0; j < numPrompts; j++){
+                //select an ingredient from dbIngs
+                var indexOfSelection = Math.floor(Math.random() * dbIngs.length);
+                var selectedIng = dbIngs[indexOfSelection];
+                ingsToPrompt.push(selectedIng);
+                dbIngs.splice(indexOfSelection,1);
+            }
+
+            //TODOLATER remove those that have tags which are incompatible with current settings
+            
+            //ingsToPrompt = ['Parmesan (Cheese)','Apple']; //testing if the code runs
+            
+            askAboutIng();
+        }
         
-        //TODOLATER remove those that have tags which are incompatible with current settings
+        
+        
+        
+        
+        
         
         
         //define function that happens on click for Yes and No
         //TODO in order to send the information to list of ingredients, we should send the new ingredients to the indexedDB after each button click?
         function onYes(ing){
             //add the ingredient to list of ingredients
-            
+            //TODO test this, it looks like it's working!
+            addData(ing, false);
             
             //remove the ingredient from the session-tied NOT AVAILABLE list 
             if(unavailables.indexOf(ing) != -1 ){
@@ -192,14 +235,19 @@
         }
         function onNo(ing){
             //remove the ingredient from list of ingredients
-            
+            //TODO test this, it doesn't appear to delete correctly
+            deleteData(ing);
             
             //add the ingredient to the session-tied NOT AVAILABLE list (so it doesn't get prompted again in a later set)
-            unavailables.push(ing);
+            if(unavailables.indexOf(ing) == -1 ){
+                unavailables.push(ing);
+            }
             
             //continue to the next prompt
             askAboutIng();
         }
+        
+        var i = 0;
         
         function askAboutIng(){
             //check if ings has been iterated through
@@ -224,7 +272,7 @@
         
         //TODO remove this, make it wait until the info from the database has been selected and the calculations have been done
         //call the first prompt
-        askAboutIng();
+        //askAboutIng();
     </script>
     <?php
 
