@@ -73,8 +73,11 @@
       display: inline-block;
     }
 
+    #ingredientDropdown {
+        bottom: -200px;
+    }
+        
     .dropdown-content {
-        bottom:-200px;
       display: none;
       position: absolute;
       background-color: #f6f6f6;
@@ -104,13 +107,17 @@
     <?php
     //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
     session_start();
-    //header('Location: adminLogin.php');
-
-    if (isset($_SESSION['loggedin'])) {
-        header('Location: indexTest.php');
+//    //header('Location: adminLogin.php');
+//
+//    if (isset($_SESSION['loggedin'])) {
+//        header('Location: page1Test.php');
+//        exit; 
+//    } else {
+//        
+//    }
+    if (!isset($_SESSION['loggedin'])) {
+        header('Location: adminLogin.php');
         exit; 
-    } else {
-        
     }
     ?>
   
