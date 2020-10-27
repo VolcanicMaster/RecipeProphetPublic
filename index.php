@@ -69,10 +69,12 @@
 
     .dropdown {
       position: relative;
+        
       display: inline-block;
     }
 
     .dropdown-content {
+        bottom:-200px;
       display: none;
       position: absolute;
       background-color: #f6f6f6;
@@ -207,7 +209,7 @@
                         -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
-                            <textarea name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;"></textarea>
+                            <input name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name and click on the ingredient you want to add..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;" autocomplete="off">
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
                               <div id="ingredientDropdown" class="dropdown-content">
