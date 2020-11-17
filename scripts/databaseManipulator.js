@@ -100,6 +100,9 @@ setUpCompleted = {
         const h3 = document.createElement('h3');
         const para = document.createElement('p');
         
+          //listItem.style.width = "200px";
+          
+          
           h3.style.float = "left";
           //para.style.float = "left";
         listItem.appendChild(h3);

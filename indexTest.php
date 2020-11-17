@@ -220,9 +220,11 @@
                                 
                                 TODOmaybe use all words in parentheses for display?
 
+                                TODO have a variable alignment function for ingredientDropdown, since it's dropdown is of variable size and if it has less than 5 elements, it doesn't properly align with the input
+
                                 TODO include ingredients like Salt, Olive Oil, Water by default
                                     AND add a button that adds common ingredients
-                                TODO add RESET button that either clears or calls the "add default" function?
+                                TODO add CLEAR ALL INGREDIENTS button that clears the indexeddb
                         -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
@@ -263,8 +265,13 @@
                             
                         </div>
                         <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-primary btn-form display-4">FIND RECIPES!</button></a></div>
+                        
+                        <div >
+                            <button class="btn btn-md btn-primary display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+                            <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
+                        </div>
                             
-                            <ul name="ingredients" id="ingredients">Ingredients: </ul>
+                        <div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>
                             
                             
                         
@@ -415,6 +422,41 @@
         xmlhttp.open( "POST", "fillIngredientDropdown.php" );
         xmlhttp.setRequestHeader( "Content-Type", "application/json" );
         xmlhttp.send();//no need to send any data
+    </script>
+    <script>
+        
+        //function to add a set of default (common) ingredients
+        function addDefaultIngs() {
+            //define a set of common ingredients that are added by default. Maybe we could allow the user to edit this in the future?
+            var defaultIngs = [
+                "Butter",
+                "Pasta",
+                "Olive Oil",
+                "Water",
+                "Salt"
+            ];
+            var i;
+            for(i = 0; i < defaultIngs.length - 1; i++){
+                addData(defaultIngs[i],false); //add ingredients without updating display
+            }
+            addData(defaultIngs[defaultIngs.length - 1],true); //add last ingredient and update display
+        }
+        
+        function clearIndexedDB(){
+            var req = window.indexedDB.deleteDatabase('notes_db');
+            req.onsuccess = function () {
+                console.log("Deleted database successfully");
+            };
+            req.onerror = function () {
+                console.log("Couldn't delete database");
+            };
+            req.onblocked = function () {
+                console.log("Couldn't delete database due to the operation being blocked");
+            };
+            //reloads the page to trigger re-instantiation of the database and proper display. 
+            location.reload();
+        }
+        
     </script>
     
   <script src="assets/web/assets/jquery/jquery.min.js"></script>

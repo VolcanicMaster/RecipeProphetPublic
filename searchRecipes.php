@@ -330,8 +330,10 @@ while ($line !== false) {
 }
 */
 
+
+//TODO do extensive testing to figure out if any of the below TODOs are still issues. 
 //TODO THE PROBLEM IS: not all ids between the first and last are present. 101 recipes but after 1,2,3 it jumps to 18__.
-//TODO 1841 repeats ingredients, as does 1835, both of which have no egg. 1830 repeats ing 13 only, no egg.
+//TODOmaybe: 1841 repeats ingredients, as does 1835, both of which have no egg. 1830 repeats ing 13 only, no egg. 1753 repeats ing 111.
 //TODO not displaying recipes at all. Could have to do with our additions of '\
 //Our code has no issue displaying large amounts of recipes (tested with 100). Though eventually we should limit the query
 
