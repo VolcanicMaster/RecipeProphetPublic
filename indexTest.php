@@ -375,7 +375,7 @@
 </section>
 
 <?php
-
+            
     $conn->close();
     //mysqli_close($conn);
 
@@ -433,7 +433,32 @@
                 "Pasta",
                 "Olive Oil",
                 "Water",
-                "Salt"
+                "Salt",
+                "(Ground) Black Pepper",
+                "Flour",
+                "Chicken",
+                "Baking Soda",
+                "Milk",
+                "Vegetable Oil",
+                "(White) Sugar",
+                "Rice",
+                "Onion",
+                "Garlic",
+                "Egg",
+                "Parmesan (Cheese)"
+            ];
+            var commonSpices = [
+                "Rosemary", 
+                "Thyme", 
+                "Paprika", 
+                "Cumin", 
+                "Crushed Red Pepper", 
+                "Red Pepper Flakes", 
+                "(Ground) Cardamom", 
+                "Oregano",
+                "Garlic Powder",
+                "Onion Powder",
+                "Cinnamon"
             ];
             var i;
             for(i = 0; i < defaultIngs.length - 1; i++){
