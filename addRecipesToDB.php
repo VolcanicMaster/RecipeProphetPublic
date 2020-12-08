@@ -24,7 +24,7 @@ if($result->num_rows > 0){
 
 //TODO put both the script and html for the tag selection into this php ("rPRecipeContainer"?)
 
-$arfile = file_get_contents("tempRecipeJSON/allrecipes700.json"); //last completed: allrecipes700
+$arfile = file_get_contents("tempRecipeJSON/allrecipes1000to1500.json"); //last completed: allrecipes1000to1500
 
 $sep = "\r\n";
 $line = strtok($arfile, $sep);
