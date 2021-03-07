@@ -1,10 +1,35 @@
 <?php
-    include "scripts/dbConnect.php"
-?>
-<?php
-        
+
+//copying dbConnect because includes don't work in cron job
+//information for connecting to the database on the server
+$user_name = "dbadmin";
+$password = "monkeydluffydb";
+$database = "database";
+$server = "localhost";
+//localhost because this operation is down on the server with the database
+
+$conn = mysqli_connect($server, $user_name, $password, $database);
+
 
 echo '<div id="newRecipeProphetRecipeGallery">';
+
+//TODO only read the json file, and add ingredients manually based on what is invalid
+//Query for the latest batch
+$sql = "SELECT * FROM track_batch ORDER BY date_run DESC LIMIT 1;";
+$result = $conn->query($sql);
+$dblastbatchrow = array();
+$completed;
+$startrecord;
+$endrecord; 
+if($result->num_rows > 0){
+    $dblastbatchrow = $result->fetch_assoc();
+} else {
+    $dblastbatchrow = ["start_record" => 1001, "end_record" => 1500, "completed" => 1];
+}
+
+$startrecord = $dblastbatchrow["start_record"];
+$endrecord = $dblastbatchrow["end_record"];
+$completed = $dblastbatchrow["completed"];
 
 //Query for ingredients
 $sql = "SELECT name FROM ingredients;";
@@ -17,244 +42,498 @@ if($result->num_rows > 0){
         $dbings[] = $row;
     }
 }
-//echo "<p>dbings length: ". count($dbings) ."</p>";
 
-//TODO only read the json file, and add ingredients manually based on what is invalid
-//TODO split the json file into parts so it can actually run? (like allrecipes100.json)
-
-//TODO put both the script and html for the tag selection into this php ("rPRecipeContainer"?)
-
-$arfile = file_get_contents("tempRecipeJSON/allrecipes1000to1500.json"); //last completed: allrecipes1000to1500
-
-$sep = "\r\n";
-$line = strtok($arfile, $sep);
-
-while ($line !== false) {
-    # do something with $line
-    $linearray = json_decode($line, true);
-    echo '<div>';
-    echo '<p>' . $linearray["title"] . '</p>';
-    $ingarray = $linearray["ingredients"];
+if ($completed == 1) {
+    //record next batch in database
+    $startrecord = $startrecord + 500;
+    $endrecord = $endrecord + 500;
+    $sql = 'INSERT INTO track_batch(date_run, start_record, end_record, completed) VALUES("'. date('Y-m-d H:i:s') .'","'. $startrecord .'","'. $endrecord .'","'. 0 .'");';
+    $conn->query($sql);
     
-    $recings = array();
-    
-    $skipre = false;
-    foreach($ingarray as $ing){
-        $ing = strtolower($ing);
-        $ifound = false;
-        
-        $ingmax = 0;
-        $ingnam = "";
-        $imaxid = "";
-        $imaxta = "";
-        $imaxop = 0;
-        
-        //check if $ing contains a valid ingredient
-        
-        //IF IT HAS A COLON, IGNORE THAT INGREDIENT (so it doesn't invalidate)
-        if(strpos($ing, ':') !== false){
-            continue;
-        }
-        
-        // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
-        
-        // output data of each row
-        foreach($dbings as $ingrow){
-            //remove parentheses and words within
-            $name = strtolower($ingrow["name"]);
+    //run it
+    //add the lines from startrecord to endrecord 
+    //use SplFileObject
+    $file = 'tempRecipeJSON/allrecipes-recipes.json';
+    $spl = new SplFileObject($file);
+    $spl->seek($startrecord); 
+    for($i = 0; $i < $endrecord - $startrecord; $i++){
+        $line = $spl->current(); //get line
 
-            $pos = strpos($name, '(');
-            while($pos !== false){
-                $endpos = strpos($name, ')');
-                $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
-                $pos = strpos($name, '(');
-            }
-            $name = trim($name);
-            
-            // if the ingredient contains the dbingredient, query it to find the best match
-            // if ingredient is wrong, just continue to the next row of the ingredients db
-            if(strpos($ing,$name) === false){
+        # do something with $line
+        $linearray = json_decode($line, true);
+        echo '<div>';
+        echo '<p>' . $linearray["title"] . '</p>';
+        $ingarray = $linearray["ingredients"];
+
+        $recings = array();
+
+        $skipre = false;
+        foreach($ingarray as $ing){
+            $ing = strtolower($ing);
+            $ifound = false;
+
+            $ingmax = 0;
+            $ingnam = "";
+            $imaxid = "";
+            $imaxta = "";
+            $imaxop = 0;
+
+            //check if $ing contains a valid ingredient
+
+            //IF IT HAS A COLON, IGNORE THAT INGREDIENT (so it doesn't invalidate)
+            if(strpos($ing, ':') !== false){
                 continue;
             }
 
-            $sql = "SELECT name, id, tags FROM ingredients WHERE name LIKE '%" . $name . "%'";
-            $result = $conn->query($sql);
+            // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
 
-            //accept whichever result has the most matching characters/words and is contained within $ing
-            if($result->num_rows > 0){
-                while($row = $result->fetch_assoc()){
-                    //echo "<p>begin LIKE name fetch</p>";
-                    //overriding $name for a different use. could be ill-advised.
-                    $name = strtolower($row["name"]);
+            // output data of each row
+            foreach($dbings as $ingrow){
+                //remove parentheses and words within
+                $name = strtolower($ingrow["name"]);
 
+                $pos = strpos($name, '(');
+                while($pos !== false){
+                    $endpos = strpos($name, ')');
+                    $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
                     $pos = strpos($name, '(');
-                    while($pos !== false){
-                        $endpos = strpos($name, ')');
-                        $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+                }
+                $name = trim($name);
+
+                // if the ingredient contains the dbingredient, query it to find the best match
+                // if ingredient is wrong, just continue to the next row of the ingredients db
+                if(strpos($ing,$name) === false){
+                    continue;
+                }
+
+                $sql = "SELECT name, id, tags FROM ingredients WHERE name LIKE '%" . $name . "%'";
+                $result = $conn->query($sql);
+
+                //accept whichever result has the most matching characters/words and is contained within $ing
+                if($result->num_rows > 0){
+                    while($row = $result->fetch_assoc()){
+                        //echo "<p>begin LIKE name fetch</p>";
+                        //overriding $name for a different use. could be ill-advised.
+                        $name = strtolower($row["name"]);
+
                         $pos = strpos($name, '(');
-                    }
-                    $name = trim($name);
-                    
-                    $exprow = explode(" ",$name);
-                    $newlen = 0;
-                    $corri = true; //tracks whether this ingredient may be correct based on content
-                    foreach($exprow as $word){
-                        //echo "<p>begin exprow word fetch, word: ". $word ."</p>";
-                        $pos = strpos($ing, $word);
-                        if($pos === false){
-                            //This is not the right ingredient, continue with the next iteration...
-                            $corri = false;
-                            break;
-                        } else {
-                            $newlen = $newlen + strlen($word);
+                        while($pos !== false){
+                            $endpos = strpos($name, ')');
+                            $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+                            $pos = strpos($name, '(');
                         }
-                        echo "<p>newlen of ". $name ." is now:". $newlen ."</p>";
-                    }
-                    if($corri === true){
-                        //if this ingredient is bigger than the previous max, replace it
-                        if($newlen > $ingmax){
-                            $ingmax = $newlen;
-                            $ingnam = $row["name"];
-                            echo "<p>newlen > ingmax. name: ". $ingnam ."</p>";
-                            $imaxid = $row["id"];
-                            $imaxta = $row["tags"];
-                            //use parsing to determine whether this ingredient is optional
-                            if(strpos($ing,"(optional)") !== false){
-                                $imaxop = 1;
+                        $name = trim($name);
+
+                        $exprow = explode(" ",$name);
+                        $newlen = 0;
+                        $corri = true; //tracks whether this ingredient may be correct based on content
+                        foreach($exprow as $word){
+                            //echo "<p>begin exprow word fetch, word: ". $word ."</p>";
+                            $pos = strpos($ing, $word);
+                            if($pos === false){
+                                //This is not the right ingredient, continue with the next iteration...
+                                $corri = false;
+                                break;
+                            } else {
+                                $newlen = $newlen + strlen($word);
+                            }
+                            echo "<p>newlen of ". $name ." is now:". $newlen ."</p>";
+                        }
+                        if($corri === true){
+                            //if this ingredient is bigger than the previous max, replace it
+                            if($newlen > $ingmax){
+                                $ingmax = $newlen;
+                                $ingnam = $row["name"];
+                                echo "<p>newlen > ingmax. name: ". $ingnam ."</p>";
+                                $imaxid = $row["id"];
+                                $imaxta = $row["tags"];
+                                //use parsing to determine whether this ingredient is optional
+                                if(strpos($ing,"(optional)") !== false){
+                                    $imaxop = 1;
+                                }
                             }
                         }
                     }
+                    if($ingnam == ""){
+                        echo '<p>corri never returned true</p>';
+                        continue;
+                    }
+                } else {
+                    echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
                 }
-                if($ingnam == ""){
-                    echo '<p>corri never returned true</p>';
+                //don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
+                //found the ingredient
+
+                $ifound = true;
+            }
+            //If no ingredient in the db matches the one in the json, print that it is invalid
+            //output line number of invalid ingredients until we have a serviceable recipe database?
+            if($ifound){
+                echo '<div>';
+                echo '<p>JSON ingredient: ' . $ing . '</p>';
+                echo '<p>Closest ingredient: ' . $ingnam . '</p>';
+                echo '</div>';
+                $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
+            } else {
+                echo '<p> Invalid ingredient: ' . $ing . '</p>';
+                //if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+                //skip to the next recipe
+                $skipre = true;
+                break;
+            }
+        }
+
+        if(!$skipre){
+
+            # if all ingredients are valid, insert into database
+
+            $ilink = $linearray["photo_url"];
+
+            $link = $linearray["url"];
+
+            $name = $linearray["title"];
+
+            $tags = "";
+            //TODO: before DB UPLOAD, add tags to every ingredient in the database
+            // assign tags based on the included ingredients (ingredients should have tags?)
+            // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
+            $lname = strtolower($name);
+            if(strpos($lname,"salad") !== false){
+                $tags = $tags . "Salad,";
+            }
+            if(strpos($lname,"spicy") !== false){
+                $tags = $tags . "Spicy,";
+            }
+            if(strpos($lname,"thai") !== false){
+                $tags = $tags . "Thai,";
+            }
+            if(strpos($lname,"chinese") !== false){
+                $tags = $tags . "Chinese,";
+            }
+            if(strpos($lname,"japanese") !== false){
+                $tags = $tags . "Japanese,";
+            }
+            if(strpos($lname,"american") !== false){
+                $tags = $tags . "American,";
+            }
+            if(strpos($lname,"indian") !== false){
+                $tags = $tags . "Indian,";
+            }
+            //read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
+            $vegan = true;
+            $lacfree = true;
+            $peanutf = true;
+            foreach($recings as $recing){
+                if(strpos($recing["tags"],"NotVegan") !== false){
+                    $vegan = false;
                     continue;
                 }
-            } else {
-                echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
+                if(strpos($recing["tags"],"Lactose") !== false){
+                    $lacfree = false;
+                    continue;
+                }
+                if(strpos($recing["tags"],"Peanut") !== false){
+                    $peanutf = false;
+                    continue;
+                }
+                $tags = $tags . $recing["tags"] . ",";
             }
-            //don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
-            //found the ingredient
+            if($vegan){
+                $tags = $tags . "Vegan,";
+            }
+            if($lacfree){
+                $tags = $tags . "Lactose-Free,";
+            }
+            if($peanutf){
+                $tags = $tags . "Peanut-Free,";
+            }
+            //remove trailing comma(s?)
+            $tags = trim($tags, ",");
+            echo "<p>tags: ". $tags ."</p>";
+            //remove repeated commas
+            $pos = strpos($tags,",,");
+            while($pos !== false){
+                $tags = str_replace(",,",",",$tags);
+                //iterate
+                $pos = strpos($tags,",,");
+            }
+            //remove duplicate tags
+            $tags = implode(',',array_unique(explode(',', $tags)));
+            echo "<p>tags after eximplode: ". $tags ."</p>";
+            //may not be necessary, but clean?
+            $tags = trim($tags, ",");
 
-            $ifound = true;
+            echo "<p>INSERTING...</p>";
+            $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
+            $conn->query($sql);
+
+            //Then, insert the ingredients into recipeIngredients
+
+            //find the recipe_id this connection just added
+            //$sql = 'SELECT LAST_INSERT_ID();';
+            //$recid = $conn->query($sql);
+            $recid = mysqli_insert_id($conn);
+
+            foreach($recings as $recing){
+                $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
+                $conn->query($sql);
+            }
         }
-        //If no ingredient in the db matches the one in the json, print that it is invalid
-        //output line number of invalid ingredients until we have a serviceable recipe database?
-        if($ifound){
-            echo '<div>';
-            echo '<p>JSON ingredient: ' . $ing . '</p>';
-            echo '<p>Closest ingredient: ' . $ingnam . '</p>';
-            echo '</div>';
-            $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
-        } else {
-            echo '<p> Invalid ingredient: ' . $ing . '</p>';
-            //if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
-            //skip to the next recipe
-            $skipre = true;
-            break;
-        }
+        echo '</div>';
+        $spl->next(); //move to the next line
+        
     }
     
-    if(!$skipre){
-
-        # if all ingredients are valid, insert into database
-
-        $ilink = $linearray["photo_url"];
-
-        $link = $linearray["url"];
-
-        $name = $linearray["title"];
-
-        $tags = "";
-        //TODO: before DB UPLOAD, add tags to every ingredient in the database
-        // assign tags based on the included ingredients (ingredients should have tags?)
-        // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
-        $lname = strtolower($name);
-        if(strpos($lname,"salad") !== false){
-            $tags = $tags . "Salad,";
-        }
-        if(strpos($lname,"spicy") !== false){
-            $tags = $tags . "Spicy,";
-        }
-        if(strpos($lname,"thai") !== false){
-            $tags = $tags . "Thai,";
-        }
-        if(strpos($lname,"chinese") !== false){
-            $tags = $tags . "Chinese,";
-        }
-        if(strpos($lname,"japanese") !== false){
-            $tags = $tags . "Japanese,";
-        }
-        if(strpos($lname,"american") !== false){
-            $tags = $tags . "American,";
-        }
-        if(strpos($lname,"indian") !== false){
-            $tags = $tags . "Indian,";
-        }
-        //read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
-        $vegan = true;
-        $lacfree = true;
-        $peanutf = true;
-        foreach($recings as $recing){
-            if(strpos($recing["tags"],"NotVegan") !== false){
-                $vegan = false;
-                continue;
-            }
-            if(strpos($recing["tags"],"Lactose") !== false){
-                $lacfree = false;
-                continue;
-            }
-            if(strpos($recing["tags"],"Peanut") !== false){
-                $peanutf = false;
-                continue;
-            }
-            $tags = $tags . $recing["tags"] . ",";
-        }
-        if($vegan){
-            $tags = $tags . "Vegan,";
-        }
-        if($lacfree){
-            $tags = $tags . "Lactose-Free,";
-        }
-        if($peanutf){
-            $tags = $tags . "Peanut-Free,";
-        }
-        //remove trailing comma(s?)
-        $tags = trim($tags, ",");
-        echo "<p>tags: ". $tags ."</p>";
-        //remove repeated commas
-        $pos = strpos($tags,",,");
-        while($pos !== false){
-            $tags = str_replace(",,",",",$tags);
-            //iterate
-            $pos = strpos($tags,",,");
-        }
-        //remove duplicate tags
-        $tags = implode(',',array_unique(explode(',', $tags)));
-        echo "<p>tags after eximplode: ". $tags ."</p>";
-        //may not be necessary, but clean?
-        $tags = trim($tags, ",");
-
-        echo "<p>INSERTING...</p>";
-        $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
-        $conn->query($sql);
-
-        //Then, insert the ingredients into recipeIngredients
-
-        //find the recipe_id this connection just added
-        //$sql = 'SELECT LAST_INSERT_ID();';
-        //$recid = $conn->query($sql);
-        $recid = mysqli_insert_id($conn);
-
-        foreach($recings as $recing){
-            $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
-            $conn->query($sql);
-        }
-    }
-    echo '</div>';
-    # iterate
-    $line = strtok( $sep );
+    //when complete update the database to reflect it
+    $sql = 'UPDATE track_batch SET completed = 1 WHERE start_record = "' . $startrecord . '";';
+    $conn->query($sql);
 }
-
+//
+////Query for ingredients
+//$sql = "SELECT name FROM ingredients;";
+//$result = $conn->query($sql);
+//$dbings = array();
+//if($result->num_rows > 0){
+//    echo '<p>if ingres</p>';
+//    while($row = $result->fetch_assoc()){
+//        //echo '<p>'. $row["name"] .'</p>';
+//        $dbings[] = $row;
+//    }
+//}
+////echo "<p>dbings length: ". count($dbings) ."</p>";
+//
+//
+//$arfile = file_get_contents("tempRecipeJSON/allrecipes1000to1500.json"); //last completed: allrecipes1000to1500
+//
+//$sep = "\r\n";
+//$line = strtok($arfile, $sep);
+//
+//while ($line !== false) {
+//    # do something with $line
+//    $linearray = json_decode($line, true);
+//    echo '<div>';
+//    echo '<p>' . $linearray["title"] . '</p>';
+//    $ingarray = $linearray["ingredients"];
+//    
+//    $recings = array();
+//    
+//    $skipre = false;
+//    foreach($ingarray as $ing){
+//        $ing = strtolower($ing);
+//        $ifound = false;
+//        
+//        $ingmax = 0;
+//        $ingnam = "";
+//        $imaxid = "";
+//        $imaxta = "";
+//        $imaxop = 0;
+//        
+//        //check if $ing contains a valid ingredient
+//        
+//        //IF IT HAS A COLON, IGNORE THAT INGREDIENT (so it doesn't invalidate)
+//        if(strpos($ing, ':') !== false){
+//            continue;
+//        }
+//        
+//        // 1st, attempt matching the words (removing words within parentheses) by checking if all words are included.
+//        
+//        // output data of each row
+//        foreach($dbings as $ingrow){
+//            //remove parentheses and words within
+//            $name = strtolower($ingrow["name"]);
+//
+//            $pos = strpos($name, '(');
+//            while($pos !== false){
+//                $endpos = strpos($name, ')');
+//                $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+//                $pos = strpos($name, '(');
+//            }
+//            $name = trim($name);
+//            
+//            // if the ingredient contains the dbingredient, query it to find the best match
+//            // if ingredient is wrong, just continue to the next row of the ingredients db
+//            if(strpos($ing,$name) === false){
+//                continue;
+//            }
+//
+//            $sql = "SELECT name, id, tags FROM ingredients WHERE name LIKE '%" . $name . "%'";
+//            $result = $conn->query($sql);
+//
+//            //accept whichever result has the most matching characters/words and is contained within $ing
+//            if($result->num_rows > 0){
+//                while($row = $result->fetch_assoc()){
+//                    //echo "<p>begin LIKE name fetch</p>";
+//                    //overriding $name for a different use. could be ill-advised.
+//                    $name = strtolower($row["name"]);
+//
+//                    $pos = strpos($name, '(');
+//                    while($pos !== false){
+//                        $endpos = strpos($name, ')');
+//                        $name = str_replace(substr($name,$pos,($endpos - $pos) + 1),'',$name);
+//                        $pos = strpos($name, '(');
+//                    }
+//                    $name = trim($name);
+//                    
+//                    $exprow = explode(" ",$name);
+//                    $newlen = 0;
+//                    $corri = true; //tracks whether this ingredient may be correct based on content
+//                    foreach($exprow as $word){
+//                        //echo "<p>begin exprow word fetch, word: ". $word ."</p>";
+//                        $pos = strpos($ing, $word);
+//                        if($pos === false){
+//                            //This is not the right ingredient, continue with the next iteration...
+//                            $corri = false;
+//                            break;
+//                        } else {
+//                            $newlen = $newlen + strlen($word);
+//                        }
+//                        echo "<p>newlen of ". $name ." is now:". $newlen ."</p>";
+//                    }
+//                    if($corri === true){
+//                        //if this ingredient is bigger than the previous max, replace it
+//                        if($newlen > $ingmax){
+//                            $ingmax = $newlen;
+//                            $ingnam = $row["name"];
+//                            echo "<p>newlen > ingmax. name: ". $ingnam ."</p>";
+//                            $imaxid = $row["id"];
+//                            $imaxta = $row["tags"];
+//                            //use parsing to determine whether this ingredient is optional
+//                            if(strpos($ing,"(optional)") !== false){
+//                                $imaxop = 1;
+//                            }
+//                        }
+//                    }
+//                }
+//                if($ingnam == ""){
+//                    echo '<p>corri never returned true</p>';
+//                    continue;
+//                }
+//            } else {
+//                echo '<p>UNEXPECTED ERROR: valid ingredient name not found</p>';
+//            }
+//            //don't add it yet, complete the loop and find the max among all iterations of this jsoning. 
+//            //found the ingredient
+//
+//            $ifound = true;
+//        }
+//        //If no ingredient in the db matches the one in the json, print that it is invalid
+//        //output line number of invalid ingredients until we have a serviceable recipe database?
+//        if($ifound){
+//            echo '<div>';
+//            echo '<p>JSON ingredient: ' . $ing . '</p>';
+//            echo '<p>Closest ingredient: ' . $ingnam . '</p>';
+//            echo '</div>';
+//            $recings[] = array("id" => $imaxid, "opt" => $imaxop, "tags" => $imaxta);
+//        } else {
+//            echo '<p> Invalid ingredient: ' . $ing . '</p>';
+//            //if ingredient is invalid (not found in ingredients db), the final code should ignore the entire recipe.
+//            //skip to the next recipe
+//            $skipre = true;
+//            break;
+//        }
+//    }
+//    
+//    if(!$skipre){
+//
+//        # if all ingredients are valid, insert into database
+//
+//        $ilink = $linearray["photo_url"];
+//
+//        $link = $linearray["url"];
+//
+//        $name = $linearray["title"];
+//
+//        $tags = "";
+//        //TODO: before DB UPLOAD, add tags to every ingredient in the database
+//        // assign tags based on the included ingredients (ingredients should have tags?)
+//        // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
+//        $lname = strtolower($name);
+//        if(strpos($lname,"salad") !== false){
+//            $tags = $tags . "Salad,";
+//        }
+//        if(strpos($lname,"spicy") !== false){
+//            $tags = $tags . "Spicy,";
+//        }
+//        if(strpos($lname,"thai") !== false){
+//            $tags = $tags . "Thai,";
+//        }
+//        if(strpos($lname,"chinese") !== false){
+//            $tags = $tags . "Chinese,";
+//        }
+//        if(strpos($lname,"japanese") !== false){
+//            $tags = $tags . "Japanese,";
+//        }
+//        if(strpos($lname,"american") !== false){
+//            $tags = $tags . "American,";
+//        }
+//        if(strpos($lname,"indian") !== false){
+//            $tags = $tags . "Indian,";
+//        }
+//        //read tags like Lactose or NotVegan that don't actually show up as a filter, but are used to create Lactose-Free and Vegan tags for recipes here?
+//        $vegan = true;
+//        $lacfree = true;
+//        $peanutf = true;
+//        foreach($recings as $recing){
+//            if(strpos($recing["tags"],"NotVegan") !== false){
+//                $vegan = false;
+//                continue;
+//            }
+//            if(strpos($recing["tags"],"Lactose") !== false){
+//                $lacfree = false;
+//                continue;
+//            }
+//            if(strpos($recing["tags"],"Peanut") !== false){
+//                $peanutf = false;
+//                continue;
+//            }
+//            $tags = $tags . $recing["tags"] . ",";
+//        }
+//        if($vegan){
+//            $tags = $tags . "Vegan,";
+//        }
+//        if($lacfree){
+//            $tags = $tags . "Lactose-Free,";
+//        }
+//        if($peanutf){
+//            $tags = $tags . "Peanut-Free,";
+//        }
+//        //remove trailing comma(s?)
+//        $tags = trim($tags, ",");
+//        echo "<p>tags: ". $tags ."</p>";
+//        //remove repeated commas
+//        $pos = strpos($tags,",,");
+//        while($pos !== false){
+//            $tags = str_replace(",,",",",$tags);
+//            //iterate
+//            $pos = strpos($tags,",,");
+//        }
+//        //remove duplicate tags
+//        $tags = implode(',',array_unique(explode(',', $tags)));
+//        echo "<p>tags after eximplode: ". $tags ."</p>";
+//        //may not be necessary, but clean?
+//        $tags = trim($tags, ",");
+//
+//        echo "<p>INSERTING...</p>";
+//        $sql = 'INSERT INTO recipes(imglink,link,name,tags) VALUES("'. $ilink .'","'. $link .'","'. $name .'","'. $tags .'");';
+//        $conn->query($sql);
+//
+//        //Then, insert the ingredients into recipeIngredients
+//
+//        //find the recipe_id this connection just added
+//        //$sql = 'SELECT LAST_INSERT_ID();';
+//        //$recid = $conn->query($sql);
+//        $recid = mysqli_insert_id($conn);
+//
+//        foreach($recings as $recing){
+//            $sql = 'INSERT INTO recipeIngredients(ingredient_id,recipe_id,optional) VALUES("'. $recing["id"] .'","'. $recid .'","'. $recing["opt"] .'");';
+//            $conn->query($sql);
+//        }
+//    }
+//    echo '</div>';
+//    # iterate
+//    $line = strtok( $sep );
+//}
+//
 
 echo '</div>';
 

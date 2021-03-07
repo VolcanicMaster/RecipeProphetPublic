@@ -161,28 +161,26 @@
         
         ///
         /////TODO do calculation to determine what the best ingredient to ask about is. 
-            //TODO do this calculation a couple times in advance to determine how many prompts would be appropriate? (Would be like 10-12 if no ings were entered?) (the end result of the calculation would be an array to loop through)
-
-            //TODO for now, select random ingredients from the database
-        ///
+        //TODO have commonality index and just order by that? sort by number of instances of ingredients in recipeIngredients?
+        //TODO factor this commonality index into a summary score that will eventually factor in calculated user preference (the more times they say they don't have an ingredient, the lower the score? Goes back up if they say yes? )
         function ingPromptSetup(){
             //generate full list of ingredients from database
             <?php
                 $dbIngs = array();
                 $dbTags = array();
-                $sql = "SELECT name,tags FROM ingredients;";
+                $sql = "SELECT name,tags FROM ingredients ORDER BY commonality DESC;";
                 $result = $conn->query($sql);
                 if ($result->num_rows > 0) {
                     // output data of each row
                     while($row = $result->fetch_assoc()) {       
                         array_push($dbIngs,($row["name"]));
-                        array_push($dbTags,($row["tags"]));
+                        //array_push($dbTags,($row["tags"]));
                     }
                 }
             ?>
             //pass to javascript
             var dbIngs = <?php echo json_encode($dbIngs); ?>;
-            var dbTags = <?php echo json_encode($dbTags); ?>;
+            //var dbTags = <?php //echo json_encode($dbTags); ?>;
             //remove those that are already on the indexeddb at this point
             var j;
             var dbIngsInitCount = dbIngs.length; //number of ingredients in the database
@@ -202,7 +200,7 @@
             //calculate what to prompt
             for(j = 0; j < numPrompts; j++){
                 //select an ingredient from dbIngs
-                var indexOfSelection = Math.floor(Math.random() * dbIngs.length);
+                var indexOfSelection = 0//Math.floor(Math.random() * dbIngs.length);
                 var selectedIng = dbIngs[indexOfSelection];
                 ingsToPrompt.push(selectedIng);
                 dbIngs.splice(indexOfSelection,1);

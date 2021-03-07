@@ -183,7 +183,7 @@
                               }
                         }
 
-                        xmlhttp.open( "POST", "addRecipesToDB.php" );
+                        xmlhttp.open( "POST", "searchRecipes.php" );
                         xmlhttp.setRequestHeader( "Content-Type", "application/json" );
                         xmlhttp.send( JSON.stringify(listOfIngredients) );
                         return listOfIngredients;

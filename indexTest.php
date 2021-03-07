@@ -21,6 +21,7 @@
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
   
     <style>
+        /*TODO implement a custom ingredients list*/
         
     /*class="form-control-label mbr-fonts-style display-7"*/
         

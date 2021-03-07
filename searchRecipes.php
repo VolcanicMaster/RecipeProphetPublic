@@ -302,11 +302,11 @@ while ($line !== false) {
 */
 
 
-//TODO do extensive testing to figure out if any of the below TODOs are still issues. 
-//TODO THE PROBLEM IS: not all ids between the first and last are present. 101 recipes but after 1,2,3 it jumps to 18__.
+//TODO do extensive testing to figure out if any of the below TODOs are still issues.
 //TODOmaybe: 1841 repeats ingredients, as does 1835, both of which have no egg. 1830 repeats ing 13 only, no egg. 1753 repeats ing 111.
-//TODO not displaying recipes at all. Could have to do with our additions of '\
-//Our code has no issue displaying large amounts of recipes (tested with 100). Though eventually we should limit the query
+//TODO limit the query to 100 or 200?
+//TODO properly vary the kinds of recipes being shown. Lower their "score" if they share too many ingredients to an existing recipe in the list?
+//  TODO 1. for each recipe, get list of ingredients by using $row["id"]
 
 // Query that selects recipes which only contain ingredients from the constraint list
 $sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
@@ -319,6 +319,8 @@ if ($result->num_rows > 0) {
         /*
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
         */
+        
+        
         echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="' 
             . $row["tags"] 
             . '" onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
