@@ -210,7 +210,7 @@ while ($line !== false) {
         $name = $linearray["title"];
 
         $tags = "";
-        //TODO: before DB UPLOAD, add tags to every ingredient in the database
+        //before DB UPLOAD, add tags to every ingredient in the database
         // assign tags based on the included ingredients (ingredients should have tags?)
         // AND based on recipe name (if the name has "Salad", tag it "Salad"?)
         $lname = strtolower($name);
@@ -309,7 +309,8 @@ while ($line !== false) {
 //  TODO 1. for each recipe, get list of ingredients by using $row["id"]
 
 // Query that selects recipes which only contain ingredients from the constraint list
-$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
+//$sql = "CALL SRecBasedOnIng( '" . $imploded_data . "' );";
+$sql = "CALL EntreePrefSRBOI( '" . $imploded_data . "' );";
 
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
