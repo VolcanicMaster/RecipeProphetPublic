@@ -224,16 +224,29 @@ if ($completed == 1) {
             $lacfree = true;
             $peanutf = true;
             foreach($recings as $recing){
+                $tagFound = false;
                 if(strpos($recing["tags"],"NotVegan") !== false){
                     $vegan = false;
-                    continue;
+                    $tagFound = true;
                 }
                 if(strpos($recing["tags"],"Lactose") !== false){
                     $lacfree = false;
-                    continue;
+                    $tagFound = true;
                 }
                 if(strpos($recing["tags"],"Peanut") !== false){
                     $peanutf = false;
+                    $tagFound = true;
+                }
+                if(strpos($recing["tags"],"Entree") !== false){
+                    $tagFound = true;
+                }
+                if(strpos($recing["tags"],"Dessert") !== false){
+                    $tagFound = true;
+                }
+                if(strpos($recing["tags"],"Default") !== false){
+                    $tagFound = true;
+                }
+                if($tagFound){
                     continue;
                 }
                 $tags = $tags . $recing["tags"] . ",";
