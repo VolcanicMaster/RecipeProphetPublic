@@ -19,6 +19,18 @@
   <link rel="stylesheet" href="assets/theme/css/style.css">
   <link rel="stylesheet" href="assets/gallery/style.css">
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+    <?php
+    //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
+    session_start();
+    //header('Location: adminLogin.php');
+
+    if (isset($_SESSION['loggedin'])) {
+        header('Location: page2Test.php');
+        exit; 
+    } else {
+        
+    }
+    ?>
     
     <style>
         #ingredientsSection {

@@ -5,7 +5,7 @@ session_start();
 if ( isset( $_POST['submit'] ) ){
     //verify that the information is correct
     // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-    if ($stmt = $conn->prepare('SELECT id, password FROM accounts WHERE username = ?')) {
+    if ($stmt = $conn->prepare('SELECT id, password FROM userAccounts WHERE username = ?')) {
         // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
         $stmt->bind_param('s', $_POST['username']);
         $stmt->execute();
@@ -22,7 +22,7 @@ if ( isset( $_POST['submit'] ) ){
                 // Verification success! User has loggedin!
                 // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
                 session_regenerate_id();
-                $_SESSION['loggedin'] = TRUE;
+                $_SESSION['userin'] = TRUE; //TODO actually use this value
                 $_SESSION['name'] = $_POST['username'];
                 $_SESSION['id'] = $id;
                 echo 'Welcome ' . $_SESSION['name'] . '!';
