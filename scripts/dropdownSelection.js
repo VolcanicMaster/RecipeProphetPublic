@@ -94,16 +94,63 @@ function selectElement(id,dropdownID,dropdownButtonID){
     $(dropdown).toggle("show");
 }
 
-function selectElementFromTextArea(id,dropdownID,textAreaID){
+function selectElementFromTextArea(id,dropdownID,textAreaID,withDB){
     //id = "AboutSelection";
     selection = document.getElementById(id);
     dropdown = document.getElementById(dropdownID);
     textArea = document.getElementById(textAreaID);
 
-    // add ingredients to database
-    addData(selection.textContent, true);
+    if(withDB){
+        // add ingredients to database
+        addData(selection.textContent, true);
+    } else {
+        createListItem(selection.textContent,id);
+    }
 
     textArea.value = "";
     $(dropdown).toggle("show");
     //$(dropdown).hide();
+}
+
+//for custom ingredient lists
+function createListItem(ingName, ingID) {
+    //ingredient list being constructed
+    var list = document.getElementById("ingredients");
+    // Create a list item, h3, and p to put each data item inside when displaying it
+    // structure the HTML fragment, and append it inside the list
+    const listItem = document.createElement('li');
+    const h3 = document.createElement('h3');
+    const idContainer = document.createElement('meta');
+
+    idContainer.content = ingID;
+    listItem.appendChild(idContainer);
+
+      //listItem.style.width = "200px";
+    h3.style.float = "left";
+    listItem.appendChild(h3);
+    list.appendChild(listItem);
+
+    // Put the data from the cursor inside the h3 and para
+    h3.textContent = ingName;
+
+    // Create a button and place it inside each listItem
+    const deleteBtn = document.createElement('button');
+    listItem.appendChild(deleteBtn);
+    deleteBtn.textContent = 'Delete';
+
+    // Set an event handler so that when the button is clicked, the deleteItem()
+    // function is run
+    deleteBtn.onclick = deleteItem;
+}
+function deleteItem(e) {
+    //ingredient list being constructed
+    var list = document.getElementById("ingredients");
+    list.removeChild(e.target);
+
+    //show the No ingredients selected message if there's nothing left
+    if(!list.firstChild) {
+      const listItem = document.createElement('li');
+      listItem.textContent = 'No ingredients selected.';
+      list.appendChild(listItem);
+    }
 }

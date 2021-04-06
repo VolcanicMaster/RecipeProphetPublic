@@ -84,8 +84,20 @@
       display: inline-block;
     }
 
-    #ingredientDropdown {
-        bottom: -200px;
+    .ingredientDropdown {
+        /*bottom: -200px;*/
+        position: fixed;
+        display: none;
+        background-color: #f6f6f6;
+        min-width: 230px;
+        overflow: auto;
+        border: 1px solid #ddd;
+        z-index: 1;
+    }
+    .ingredientDropdown + .ingredientDropdown {
+        visibility: hidden;
+        position: static;
+        padding-top: 200px;
     }
         
     .dropdown-content {
@@ -129,6 +141,11 @@
     if (!isset($_SESSION['loggedin'])) {
         header('Location: adminLogin.php');
         exit; 
+    }
+    
+    if (isset($_SESSION['message'])) {
+        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
+        unset($_SESSION['message']);
     }
     ?>
   
@@ -244,7 +261,7 @@
                             <input name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name and click on the ingredient you want to add..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;" autocomplete="off">
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
-                              <div id="ingredientDropdown" class="dropdown-content">
+                              <div id="ingredientDropdown" class="ingredientDropdown">
                                 
                               </div>
                             </div>
@@ -449,8 +466,8 @@
         }
 
         xmlhttp.open( "POST", "fillIngredientDropdown.php" );
-        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-        xmlhttp.send();//no need to send any data
+        xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
+        xmlhttp.send('TRUE');
     </script>
     <script>
         
