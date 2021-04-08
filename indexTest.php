@@ -22,8 +22,29 @@
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css">
   <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
   
+    <?php
+    //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
+    session_start();
+//    //header('Location: adminLogin.php');
+//
+//    if (isset($_SESSION['loggedin'])) {
+//        header('Location: page1Test.php');
+//        exit; 
+//    } else {
+//        
+//    }
+    if (!isset($_SESSION['loggedin'])) {
+        header('Location: adminLogin.php');
+        exit; 
+    }
+    
+    if (isset($_SESSION['message'])) {
+        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
+        unset($_SESSION['message']);
+    }
+    ?>
+    
     <style>
-        /*TODO implement a custom ingredients list*/
         
     /*class="form-control-label mbr-fonts-style display-7"*/
         
@@ -119,7 +140,71 @@
     }
 
     .dropdown p:hover {background-color: #ddd;}
+        
+    /* The sidebar menu */
+    .sidebar {
+      height: 100%; /* 100% Full-height */
+      width: 0; /* 0 width - change this with JavaScript */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Stay on top */
+      top: 0;
+      left: 0;
+      background-color: #111; /* Black*/
+      overflow-x: hidden; /* Disable horizontal scroll */
+      padding-top: 160px; /* Place content 60px from the top */
+      transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+    }
 
+    /*."sidebar a" styles is unused rn*/
+    /* The sidebar links */
+    .sidebar a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+
+    /* When you mouse over the navigation links, change their color */
+    .sidebar a:hover {
+      color: #f1f1f1;
+    }
+
+    /* Position and style the close button (top right corner) */
+    .sidebar .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 300px;
+    }
+
+    /* The button used to open the sidebar */
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #111;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+    }
+
+    .openbtn:hover {
+      background-color: #444;
+    }
+
+    /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+    #main {
+      transition: margin-left .5s; /* If you want a transition effect */
+    }
+
+    /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+    @media screen and (max-height: 450px) {
+      .sidebar {padding-top: 15px;}
+      .sidebar a {font-size: 18px;}
+    }
+        
     .show {display: block;}
         
     .hide {
@@ -127,30 +212,24 @@
     }
     </style>
     
-    <?php
-    //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
-    session_start();
-//    //header('Location: adminLogin.php');
-//
-//    if (isset($_SESSION['loggedin'])) {
-//        header('Location: page1Test.php');
-//        exit; 
-//    } else {
-//        
-//    }
-    if (!isset($_SESSION['loggedin'])) {
-        header('Location: adminLogin.php');
-        exit; 
-    }
     
-    if (isset($_SESSION['message'])) {
-        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
-        unset($_SESSION['message']);
-    }
-    ?>
   
 </head>
 <body>
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>
+    <div >
+        <button class="dropBtn btn btn-sm display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+        <a class="createCustomIngredientListBtn btn btn-sm display-4" href="createCustomIngredientList.php">
+            <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></a>
+        <!--TODO make code to load buttons to add custom lists here for each one in the account-->
+        <!--<button class="dropBtn btn btn-sm display-4">
+            Add NAME HERE</button>-->
+        <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
+    </div>
+    <ul name="ingredients" id="ingredients">Ingredients: </ul>
+</div>
+<div id="main">
   <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
 
     
@@ -189,7 +268,7 @@
         </div>
     </nav>
 </section>
-
+    
 <section class="engine"></section><section class="cid-qTkA127IK8 mbr-fullscreen" id="header2-1">
 
     
@@ -220,41 +299,33 @@
 ?>
 <section class="mbr-section form1 cid-rXBVuCaPZB" id="ingredientForm">
 
-    
-
-    
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="title col-12 col-lg-8">
-                
-                
+    <div class="container" >
+            <div class="row justify-content-center">
+                <div class="title col-12 col-lg-8">
+                    <div>
+                      <button class="openbtn" onclick="openOrCloseNav()">&#9776; See your current "inventory"</button>
+                    </div>
+                </div>
             </div>
-        </div>
     </div>
-    <div class="container">
+    <div class="container" >
         <div class="row justify-content-center">
             <div class="media-container-column col-lg-8" > <!--data-form-type="formoid"-->
                 <!---Formbuilder Form--->
                 <div>
                     <div class="row">
-                        
+
                         <!--<div hidden="hidden" data-form-alert-danger="" class="alert alert-danger col-12">
                         </div>-->
                     </div>
                     <div class="dragArea row">
-                        
-                        
+
+
                         <!-- 
                                 generates ingredients list from database, 
                                 filterFunction limits number of ingredients shown at once
-                                
+
                                 TODOmaybe use all words in parentheses for display?
-
-                                TODO have a variable alignment function for ingredientDropdown, since it's dropdown is of variable size and if it has less than 5 elements, it doesn't properly align with the input
-
-                                TODO include ingredients like Salt, Olive Oil, Water by default
-                                    AND add a button that adds common ingredients
-                                TODO add CLEAR ALL INGREDIENTS button that clears the indexeddb
                         -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
@@ -262,18 +333,18 @@
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
                               <div id="ingredientDropdown" class="ingredientDropdown">
-                                
+
                               </div>
                             </div>
-                            
-                            <div class="dropdown">
+
+                            <!--<div class="dropdown">
                               <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Difficulty Preference</button>
                               <div id="easyFilter" class="dropdown-content">
                                 <p id="noDifficultyPreferenceSelection" onclick="selectElement('noDifficultyPreferenceSelection','easyFilter','easyFilterButton')">No Difficulty Preference</p>
                                 <p id="easySelection" onclick="selectElement('easySelection','easyFilter','easyFilterButton')">Easy</p>
                               </div>
-                            </div>
-                            
+                            </div>-->
+
                             <!--<div class="dropdown">
                               <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Meal Type Preference</button>
                               <div id="easyFilter" class="dropdown-content">
@@ -281,7 +352,7 @@
                                 <p id="easySelection" onclick="selectElement('easySelection','easyFilter','easyFilterButton')">Easy</p>
                               </div>
                             </div>-->
-                            
+
                             <!--
                             <div class="dropdown">
                               <button onclick="myFunction('cuisineFilter')" class="dropbtn" id="cuisineFilterButton">No Cuisine Preference</button>
@@ -291,36 +362,33 @@
                                 <a href="#thaiSelection"  id="thaiSelection" onclick="selectElement('thaiSelection','thaiFilter','thaiFilterButton')">Thai</a>
                               </div>
                             </div>-->
-                            
-                            <div class="dropdown">
+
+                            <!--<div class="dropdown">
                               <button onclick="myFunction('lightFilter')" class="dropbtn" id="lightFilterButton">No Meal Weight Preference</button>
                               <div id="lightFilter" class="dropdown-content">
                                 <p id="noLightPreferenceSelection" onclick="selectElement('noLightPreferenceSelection','lightFilter','lightFilterButton')">No Meal Weight Preference</p>
                                 <p id="lightSelection" onclick="selectElement('lightSelection','lightFilter','lightFilterButton')">Light Meal</p>
                                 <p id="heavySelection" onclick="selectElement('heavySelection','lightFilter','lightFilterButton')">Heavy Meal</p>
                               </div>
-                            </div>
-                            
+                            </div>-->
+
                         </div>
                         <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-lg btn-primary btn-form display-5">FIND RECIPES!</button></a></div>
-                        
-                        <div >
+
+                        <!--<div >
                             <button class="dropBtn btn btn-sm display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
                             <a class="createCustomIngredientListBtn btn btn-sm display-4" href="createCustomIngredientList.php">
                                 <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></a>
-                            <!--TODO make code to load buttons to add custom lists here for each one in the account-->
-                            <button class="dropBtn btn btn-sm display-4">
-                                Add NAME HERE</button>
                             <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
-                        </div>
-                            
-                        <div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>
-                            
-                            
-                        
+                        </div>-->
+
+                        <!--<div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>-->
+
+
+
                     </div>
                 </div><!---Formbuilder Form--->
-                
+
                 <!--<div class="dropdown">
                               <button onclick="myFunction('myDropdown')" class="dropbtn" id="dropdownButton">Dropdown</button>
                               <div id="myDropdown" class="dropdown-content">
@@ -334,8 +402,8 @@
                                 <a href="#tools">Tools</a>
                               </div>
                             </div>-->
-                
-                
+
+
             </div>
         </div>
     </div>
@@ -419,7 +487,7 @@
         </div>
     </div>
 </section>
-
+</div>
 <?php
             
     $conn->close();
@@ -444,8 +512,35 @@
                     }
                 };
                 </script>
+    <script>
+        const sidebarMaxWidth = "500px";
+        var sidebarWidth = sidebarMaxWidth;
+        
+        function openNav() {
+            if(parseInt(window.screen.width) < parseInt(sidebarMaxWidth)){
+                console.log("screen width was lower than sidebarMaxWidth!");
+                sidebarWidth = window.screen.width;
+            }
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            //document.getElementById("main").style.marginLeft = "250px"; //move the main page
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            //document.getElementById("main").style.marginLeft = "0"; //move the main page
+        }
+        
+        function openOrCloseNav(){
+            if(parseInt(document.getElementById("mySidebar").style.width) > 0){
+               //already open, close it
+                closeNav();
+            } else {
+                openNav();
+            }
+        }
+    </script>
     <script src="scripts/dropdownSelection.js"></script>
-    <!--TODO: only run dropdownSelection after fillIngredientDropdown has completed?-->
+    <!--probably not necessary to change anything to make sure dropdownSelection only after fillIngredientDropdown has completed-->
     <script>
         const ingredientDropdown = document.getElementById('ingredientDropdown');
         

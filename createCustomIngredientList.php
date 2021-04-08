@@ -145,8 +145,12 @@ if ($_SESSION['userin'] == TRUE){
 
 
 ?>
-
-<label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
+<section class="mbr-section form1 cid-rXBVuCaPZB">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="title col-12 col-lg-8">
+                
+                <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
                             <input name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name and click on the ingredient you want to add..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;" autocomplete="off">
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
@@ -154,54 +158,18 @@ if ($_SESSION['userin'] == TRUE){
                                 
                               </div>
                             </div>
-<div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>
+                            <div><button id="submitButton" type="submit" onclick="submitCIL()" class="btn btn-lg btn-primary btn-form display-5">Save changes</button></div>
+                        <div ><ul name="ingredients" id="ingredients"></ul></div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
 
 
 <!--<script src="scripts/databaseManipulator.js"></script>-->
 <script>    
-    var list = document.getElementById("ingredients");
-    function createListItem(ingName, ingID) {
-        //ingredient list being constructed
-        var list = document.getElementById("ingredients");
-        // Create a list item, h3, and p to put each data item inside when displaying it
-        // structure the HTML fragment, and append it inside the list
-        const listItem = document.createElement('li');
-        const h3 = document.createElement('h3');
-        const idContainer = document.createElement('meta');
-        
-        idContainer.content = ingID;
-        listItem.appendChild(idContainer);
-        
-          //listItem.style.width = "200px";
-        h3.style.float = "left";
-        listItem.appendChild(h3);
-        list.appendChild(listItem);
-
-        // Put the data from the cursor inside the h3 and para
-        h3.textContent = ingName;
-
-        // Create a button and place it inside each listItem
-        const deleteBtn = document.createElement('button');
-        listItem.appendChild(deleteBtn);
-        deleteBtn.textContent = 'Delete';
-
-        // Set an event handler so that when the button is clicked, the deleteItem()
-        // function is run
-        deleteBtn.onclick = deleteItem;
-    }
-      function deleteItem(e) {
-        //ingredient list being constructed
-        var list = document.getElementById("ingredients");
-        list.removeChild(e.target);
-        
-        //show the No ingredients selected message if there's nothing left
-        if(!list.firstChild) {
-          const listItem = document.createElement('li');
-          listItem.textContent = 'No ingredients selected.';
-          list.appendChild(listItem);
-        }
-      }
-    
     var ingids = [];
     //helper function to get the ingredient id from the html
     function getIngredientIDFromHTMLObject(item, index){
@@ -210,13 +178,23 @@ if ($_SESSION['userin'] == TRUE){
     }
     
     function submitCIL() {
+        console.log("entered submitCIL");
+        var list = document.getElementById("ingredients");
         //check if the first child's listItem has the textContent 'No ingredients selected.'
-        if(list.firstChild.textContent.equals('No ingredients selected.')){
+        if(!list.hasChildNodes()){
+            //TODO say no ingredients are selected and stay on the page.
+            console.log("no ingredients selected");
+           return;
+        }
+        if(list.firstChild.textContent === 'No ingredients selected.'){
+            //TODO remove all "no ingredient selected" functionality or say no ingredients are selected and stay on the page.
+            console.log("no ingredients selected");
            return;
         }
         //get all names from the ingredient list
         list.childNodes.forEach(getIngredientIDFromHTMLObject);
-                
+        console.log("names retrieved from ingredient list");    
+        
         //send js array to php like in searchRecipes, convert ingids to php array.
         var xmlhttp = new XMLHttpRequest;
 
@@ -226,7 +204,7 @@ if ($_SESSION['userin'] == TRUE){
                 console.log("entered onreadystatechange for sendToProcessCustomIngredientList");
                 //let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
                 //let resultObj = doc.getElementById("result");
-                //objToBeReplaced.parentNode.replaceChild(resultObj, objToBeReplaced);
+                //console.log(resultObj.textContent);
                 
                 //TODO check for errors and keep them on the page if there's something wrong for some reason?
                 
@@ -277,11 +255,12 @@ if ($_SESSION['userin'] == TRUE){
     xmlhttp.send('false');//send boolean (whether or not we use the db, in this case no)
 </script>
 <script>
+    /*var list = document.getElementById("ingredients");
     if(!list.firstChild) {
           const listItem = document.createElement('li');
           listItem.textContent = 'No ingredients selected.'
           list.appendChild(listItem);
-        }
+        }*/
 </script>
     
     <script src="assets/web/assets/jquery/jquery.min.js"></script>

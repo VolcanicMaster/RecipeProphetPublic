@@ -148,9 +148,9 @@ function deleteItem(e) {
     list.removeChild(e.target);
 
     //show the No ingredients selected message if there's nothing left
-    if(!list.firstChild) {
+    /*if(!list.firstChild) {
       const listItem = document.createElement('li');
       listItem.textContent = 'No ingredients selected.';
       list.appendChild(listItem);
-    }
+    }*/
 }
