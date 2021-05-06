@@ -27,21 +27,18 @@
     session_start();
 //    //header('Location: adminLogin.php');
 //
-//    if (isset($_SESSION['loggedin'])) {
-//        header('Location: page1Test.php');
-//        exit; 
-//    } else {
-//        
-//    }
+    
+    /*if (isset($_SESSION['message'])) {
+        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
+        unset($_SESSION['message']);
+    }*/
+    
     if (!isset($_SESSION['loggedin'])) {
         header('Location: adminLogin.php');
         exit; 
     }
     
-    if (isset($_SESSION['message'])) {
-        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
-        unset($_SESSION['message']);
-    }
+    
     ?>
     
     <style>
@@ -155,19 +152,19 @@
       transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
     }
 
-    /*."sidebar a" styles is unused rn*/
     /* The sidebar links */
-    .sidebar a {
-      padding: 8px 8px 8px 32px;
+    .sidebar li, .sidebar a {
       text-decoration: none;
-      font-size: 25px;
       color: #818181;
       display: block;
       transition: 0.3s;
     }
-
+    .sidebar a{
+        padding: 8px 8px 8px 32px;
+        font-size: 25px;
+    }
     /* When you mouse over the navigation links, change their color */
-    .sidebar a:hover {
+    .sidebar li:hover, .sidebar a:hover {
       color: #f1f1f1;
     }
 
@@ -194,7 +191,6 @@
       background-color: #444;
     }
 
-    /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
     #main {
       transition: margin-left .5s; /* If you want a transition effect */
     }
@@ -220,11 +216,9 @@
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>
     <div >
         <button class="dropBtn btn btn-sm display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
-        <a class="createCustomIngredientListBtn btn btn-sm display-4" href="createCustomIngredientList.php">
-            <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></a>
-        <!--TODO make code to load buttons to add custom lists here for each one in the account-->
-        <!--<button class="dropBtn btn btn-sm display-4">
-            Add NAME HERE</button>-->
+        <!--TODO change this to an edit feature for Add Common Ingredients & readd custom list functionality and login when ready-->
+        <!--<button class="createCustomIngredientListBtn btn btn-sm display-4" onclick="location.href = 'createCustomIngredientList.php';">
+            <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></button>-->
         <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
     </div>
     <ul name="ingredients" id="ingredients">Ingredients: </ul>
@@ -260,10 +254,11 @@
                 </li></ul>-->
             <div class="navbar-buttons mbr-section-btn"><!--<a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
                     Help</a>-->
-                <a class="btn btn-sm btn-primary display-4" href="login.php">
-                    <!--<span class="mbri-save mbr-iconfont mbr-iconfont-btn"></span>-->
-                    <!--TODO add logout button-->
+                <a id="loginBtn" class="btn btn-sm btn-primary display-4" href="login.php">
+                    <!--TODO add favorites page mbri-star-->
                     <span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>
+                <a id="accountBtn" style="display: none" class="btn btn-sm btn-primary display-4" href="account.php">
+                    <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Account Preferences</a>
             </div>
         </div>
     </nav>
@@ -282,7 +277,8 @@
                     Enter Ingredients, <br>Find Recipes</h1>
                 
                 <p class="mbr-text pb-3 mbr-fonts-style display-5">Enter as little as 2 ingredients, and we'll ask you if you have certain other ingredients to find the perfect recipe you can make without leaving home.</p>
-                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="index.php#ingredientForm">FIND RECIPES!</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="page1.php">FIND RECIPES!</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-white display-4" href="index.php#ingredientForm">Advanced Search</a></div>
             </div>
         </div>
     </div>
@@ -461,7 +457,7 @@
             <div class="media-container-row mbr-white">
                 <div class="col-sm-6 copyright">
                     <p class="mbr-text mbr-fonts-style display-7">
-                        © Copyright 2020 Recipe Prophet - All Rights Reserved
+                        © Copyright 2021 Recipe Prophet - All Rights Reserved
                     </p>
                 </div>
                 <div class="col-md-6">
@@ -492,21 +488,29 @@
             
     $conn->close();
     //mysqli_close($conn);
+    
+    if (isset($_SESSION['userin'])) {
+        //if($_SESSION['userin'] == TRUE){
+            //change log in button to account info button
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("loginBtn").style.display = "none";';
+            echo 'document.getElementById("accountBtn").style.display = "";';
+            echo '</script>';
+        //}
+    }
 
-?>
-    
-    
+?>    
     
     <script src="scripts/databaseManipulator.js"></script>
     <script>
                 document.onclick = function(e){
                     //add this clickoff functionality to all dropdowns 
-                    if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
+                    /*if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
                       document.getElementById('easyFilter').style.display = 'none';
                     }
                     if(e.target.id !== 'lightFilter' && e.target.id !== 'lightFilterButton'){
                       document.getElementById('lightFilter').style.display = 'none';
-                    }
+                    }*/
                     if(e.target.id !== 'ingredientDropdown' && e.target.id !== 'search'){
                       document.getElementById('ingredientDropdown').style.display = 'none';
                     }
@@ -549,20 +553,34 @@
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 //do display results code in searchRecipes.php, then put the responseText in the gallery
-                console.log("entered onreadystatechange");
+                //console.log("entered onreadystatechange");
                 let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
                 let newIngredientDropdown = doc.getElementById("ingredientDropdown");
                 ingredientDropdown.parentNode.replaceChild(newIngredientDropdown, ingredientDropdown);
 
+                //add Enter key listener
+                const search = document.getElementById("search");
+                search.addEventListener("keydown", function (e) {
+                    if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+                        //add the top ingredient in the dropdown to the list
+                        //grab the first child with style that doesn't have "display:none;"
+                        selectElementFromTextArea(getFirstVisibleChild(ingredientDropdown.id),ingredientDropdown.id,search.id,1);
+                    }
+                });
+                
                 //TODO tags are present on the recipe elements, but not as buttons
 
-                console.log("ended onreadystatechange");
+                //console.log("ended onreadystatechange");
               }
         }
 
         xmlhttp.open( "POST", "fillIngredientDropdown.php" );
         xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
         xmlhttp.send('TRUE');
+        
+        
+    </script>
+    <script>
     </script>
     <script>
         

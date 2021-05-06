@@ -144,14 +144,6 @@
 
     .dropdown p:hover {background-color: #ddd;}
         
-    .createCustomIngredientListBtn {
-        background-color: #ddd;
-    }
-        
-    .createCustomIngredientListBtn:focus, .createCustomIngredientListBtn:hover {
-        background-color: #99a5af;
-    }
-        
     /* The sidebar menu */
     .sidebar {
       height: 100%; /* 100% Full-height */
@@ -166,19 +158,19 @@
       transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
     }
 
-    /*."sidebar a" styles is unused rn*/
     /* The sidebar links */
-    .sidebar a {
-      padding: 8px 8px 8px 32px;
+    .sidebar li, .sidebar a {
       text-decoration: none;
-      font-size: 25px;
       color: #818181;
       display: block;
       transition: 0.3s;
     }
-
+    .sidebar a{
+        padding: 8px 8px 8px 32px;
+        font-size: 25px;
+    }
     /* When you mouse over the navigation links, change their color */
-    .sidebar a:hover {
+    .sidebar li:hover, .sidebar a:hover {
       color: #f1f1f1;
     }
 
@@ -230,7 +222,7 @@
 <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>
     <div >
-        <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
+        <button class="btn btn-md btn-secondary display-4" onclick="clearVisualIngs()">Clear All</button>
     </div>
     <ul name="ingredients" id="ingredients"></ul>
 </div>
@@ -347,16 +339,7 @@
     </div>
 </section>
 </div>
-<?php
-            
-    //$conn->close();
-    //mysqli_close($conn);
-
-?>
     
-    
-    
-    <script src="scripts/databaseManipulator.js"></script>
     <script>
                 document.onclick = function(e){
                     //add this clickoff functionality to all dropdowns 
@@ -475,9 +458,16 @@
 
     xmlhttp.open( "POST", "fillIngredientDropdown.php" );
     xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
-    xmlhttp.send('false');//send boolean (whether or not we use the db, in this case no)
+    xmlhttp.send('FALSE');//send boolean (whether or not we use the db, in this case no)
 </script>
-    
+    <script>
+        function clearVisualIngs(){
+            var list = document.getElementById("ingredients");
+            while(list.firstChild){
+                list.removeChild(list.firstChild);
+            }
+        }
+    </script>    
   <script src="assets/web/assets/jquery/jquery.min.js"></script>
   <script src="assets/popper/popper.min.js"></script>
   <script src="assets/bootstrap/js/bootstrap.min.js"></script>

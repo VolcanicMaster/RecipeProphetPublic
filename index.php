@@ -20,6 +20,25 @@
   <link rel="stylesheet" href="assets/theme/css/style.css">
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
   
+    <?php
+    //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
+    session_start();
+//    //header('Location: adminLogin.php');
+//
+    
+    /*if (isset($_SESSION['message'])) {
+        echo '<script type="text/javascript">alert("' . $_SESSION['message'] . '");</script>';
+        unset($_SESSION['message']);
+    }*/
+    
+    if (isset($_SESSION['loggedin'])) {
+        header('Location: indexTest.php');
+        exit; 
+    }
+    
+    
+    ?>
+    
     <style>
         
     /*class="form-control-label mbr-fonts-style display-7"*/
@@ -29,7 +48,7 @@
     }
         
     .dropbtn {
-      background-color: #76a5af;
+      background-color: #99a5af;
       color: white;
       padding: 16px;
       font-size: 16px;
@@ -66,6 +85,14 @@
     }
 
     #myInput:focus {outline: 3px solid #ddd;}*/
+        
+    .createCustomIngredientListBtn {
+        background-color: #ddd;
+    }
+        
+    .createCustomIngredientListBtn:focus, .createCustomIngredientListBtn:hover {
+        background-color: #99a5af;
+    }
 
     .dropdown {
       position: relative;
@@ -73,8 +100,20 @@
       display: inline-block;
     }
 
-    #ingredientDropdown {
-        bottom: -200px;
+    .ingredientDropdown {
+        /*bottom: -200px;*/
+        position: fixed;
+        display: none;
+        background-color: #f6f6f6;
+        min-width: 230px;
+        overflow: auto;
+        border: 1px solid #ddd;
+        z-index: 1;
+    }
+    .ingredientDropdown + .ingredientDropdown {
+        visibility: hidden;
+        position: static;
+        padding-top: 200px;
     }
         
     .dropdown-content {
@@ -96,7 +135,71 @@
     }
 
     .dropdown p:hover {background-color: #ddd;}
+        
+    /* The sidebar menu */
+    .sidebar {
+      height: 100%; /* 100% Full-height */
+      width: 0; /* 0 width - change this with JavaScript */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Stay on top */
+      top: 0;
+      left: 0;
+      background-color: #111; /* Black*/
+      overflow-x: hidden; /* Disable horizontal scroll */
+      padding-top: 160px; /* Place content 60px from the top */
+      transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+    }
 
+    /*."sidebar a" styles is unused rn*/
+    /* The sidebar links */
+    .sidebar a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
+
+    /* When you mouse over the navigation links, change their color */
+    .sidebar a:hover {
+      color: #f1f1f1;
+    }
+
+    /* Position and style the close button (top right corner) */
+    .sidebar .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 300px;
+    }
+
+    /* The button used to open the sidebar */
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #111;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+    }
+
+    .openbtn:hover {
+      background-color: #444;
+    }
+
+    /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+    #main {
+      transition: margin-left .5s; /* If you want a transition effect */
+    }
+
+    /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+    @media screen and (max-height: 450px) {
+      .sidebar {padding-top: 15px;}
+      .sidebar a {font-size: 18px;}
+    }
+        
     .show {display: block;}
         
     .hide {
@@ -105,21 +208,21 @@
     </style>
     
     
-<?php
-    //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
-    session_start();
-    //header('Location: adminLogin.php');
-
-    if (isset($_SESSION['loggedin'])) {
-        header('Location: indexTest.php');
-        exit; 
-    } else {
-        
-    }
-    ?>
   
 </head>
 <body>
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>
+    <div >
+        <button class="dropBtn btn btn-sm display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+        <!--TODO change this to an edit feature for Add Common Ingredients & readd custom list functionality and login when ready-->
+        <!--<button class="createCustomIngredientListBtn btn btn-sm display-4" onclick="location.href = 'createCustomIngredientList.php';">
+            <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></button>-->
+        <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
+    </div>
+    <ul name="ingredients" id="ingredients">Ingredients: </ul>
+</div>
+<div id="main">
   <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
 
     
@@ -145,18 +248,21 @@
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
-                    <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
-                        
-                        About Us
-                    </a>
-                </li></ul>
-            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
-                    Help</a></div>
+            <!--<ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
+                    <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>Send Feedback</a>
+                </li></ul>-->
+            <div class="navbar-buttons mbr-section-btn"><!--<a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
+                    Help</a>-->
+                <!--TODO readd login when sign up works-->
+                <!--<a class="btn btn-sm btn-primary display-4" href="login.php">-->
+                    <!--<span class="mbri-save mbr-iconfont mbr-iconfont-btn"></span>-->
+                    <!--TODO add logout button-->
+                    <!--<span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>-->
+            </div>
         </div>
     </nav>
 </section>
-
+    
 <section class="engine"></section><section class="cid-qTkA127IK8 mbr-fullscreen" id="header2-1">
 
     
@@ -170,7 +276,8 @@
                     Enter Ingredients, <br>Find Recipes</h1>
                 
                 <p class="mbr-text pb-3 mbr-fonts-style display-5">Enter as little as 2 ingredients, and we'll ask you if you have certain other ingredients to find the perfect recipe you can make without leaving home.</p>
-                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="index.php#ingredientForm">FIND RECIPES!</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-secondary display-4" href="page1.php">FIND RECIPES!</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-white display-4" href="index.php#ingredientForm">Advanced Search</a></div>
             </div>
         </div>
     </div>
@@ -187,60 +294,60 @@
 ?>
 <section class="mbr-section form1 cid-rXBVuCaPZB" id="ingredientForm">
 
-    
-
-    
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="title col-12 col-lg-8">
-                
-                
+    <div class="container" >
+            <div class="row justify-content-center">
+                <div class="title col-12 col-lg-8">
+                    <div>
+                      <button class="openbtn" onclick="openOrCloseNav()">&#9776; See your current "inventory"</button>
+                    </div>
+                </div>
             </div>
-        </div>
     </div>
-    <div class="container">
+    <div class="container" >
         <div class="row justify-content-center">
             <div class="media-container-column col-lg-8" > <!--data-form-type="formoid"-->
                 <!---Formbuilder Form--->
                 <div>
                     <div class="row">
-                        
+
                         <!--<div hidden="hidden" data-form-alert-danger="" class="alert alert-danger col-12">
                         </div>-->
                     </div>
                     <div class="dragArea row">
-                        
-                        
+
+
                         <!-- 
                                 generates ingredients list from database, 
                                 filterFunction limits number of ingredients shown at once
-                                
+
                                 TODOmaybe use all words in parentheses for display?
-
-                                TODO have a variable alignment function for ingredientDropdown, since it's dropdown is of variable size and if it has less than 5 elements, it doesn't properly align with the input
-
-                                TODO include ingredients like Salt, Olive Oil, Water by default
-                                    AND add a button that adds common ingredients
-                                TODO add CLEAR ALL INGREDIENTS button that clears the indexeddb
                         -->
                         <div data-for="message" class="col-md-12 form-group">
                             <label id="enterIngredientsLabel" for="message-form1-3" class="form-control-label mbr-fonts-style display-7">Enter Ingredients</label>
                             <input name="search" data-form-field="Message" class="form-control display-7" placeholder="Start typing ingredient name and click on the ingredient you want to add..." id="search" onkeyup="filterFunction('search','ingredientDropdown')" style="resize: none;" autocomplete="off">
                             <ul name="results" id="results"></ul>
                             <div class="dropdown">
-                              <div id="ingredientDropdown" class="dropdown-content">
-                                
+                              <div id="ingredientDropdown" class="ingredientDropdown">
+
                               </div>
                             </div>
-                            
-                            <div class="dropdown">
+
+                            <!--<div class="dropdown">
                               <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Difficulty Preference</button>
                               <div id="easyFilter" class="dropdown-content">
                                 <p id="noDifficultyPreferenceSelection" onclick="selectElement('noDifficultyPreferenceSelection','easyFilter','easyFilterButton')">No Difficulty Preference</p>
                                 <p id="easySelection" onclick="selectElement('easySelection','easyFilter','easyFilterButton')">Easy</p>
                               </div>
-                            </div>
-                            
+                            </div>-->
+
+                            <!--<div class="dropdown">
+                              <button onclick="myFunction('easyFilter')" class="dropbtn" id="easyFilterButton">No Meal Type Preference</button>
+                              <div id="easyFilter" class="dropdown-content">
+                                <p id="noDifficultyPreferenceSelection" onclick="selectElement('noDifficultyPreferenceSelection','easyFilter','easyFilterButton')">No Difficulty Preference</p>
+                                <p id="easySelection" onclick="selectElement('easySelection','easyFilter','easyFilterButton')">Easy</p>
+                              </div>
+                            </div>-->
+
                             <!--
                             <div class="dropdown">
                               <button onclick="myFunction('cuisineFilter')" class="dropbtn" id="cuisineFilterButton">No Cuisine Preference</button>
@@ -250,31 +357,33 @@
                                 <a href="#thaiSelection"  id="thaiSelection" onclick="selectElement('thaiSelection','thaiFilter','thaiFilterButton')">Thai</a>
                               </div>
                             </div>-->
-                            
-                            <div class="dropdown">
+
+                            <!--<div class="dropdown">
                               <button onclick="myFunction('lightFilter')" class="dropbtn" id="lightFilterButton">No Meal Weight Preference</button>
                               <div id="lightFilter" class="dropdown-content">
                                 <p id="noLightPreferenceSelection" onclick="selectElement('noLightPreferenceSelection','lightFilter','lightFilterButton')">No Meal Weight Preference</p>
                                 <p id="lightSelection" onclick="selectElement('lightSelection','lightFilter','lightFilterButton')">Light Meal</p>
                                 <p id="heavySelection" onclick="selectElement('heavySelection','lightFilter','lightFilterButton')">Heavy Meal</p>
                               </div>
-                            </div>
-                            
+                            </div>-->
+
                         </div>
-                        <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-primary btn-form display-4">FIND RECIPES!</button></a></div>
-                        
-                        <div >
-                            <button class="btn btn-md btn-primary display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+                        <div class="col-md-12 input-group-btn align-center"><a href="page1.php"><button id="submitButton" type="submit" class="btn btn-lg btn-primary btn-form display-5">FIND RECIPES!</button></a></div>
+
+                        <!--<div >
+                            <button class="dropBtn btn btn-sm display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+                            <a class="createCustomIngredientListBtn btn btn-sm display-4" href="createCustomIngredientList.php">
+                                <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></a>
                             <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
-                        </div>
-                            
-                        <div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>
-                            
-                            
-                        
+                        </div>-->
+
+                        <!--<div ><ul name="ingredients" id="ingredients">Ingredients: </ul></div>-->
+
+
+
                     </div>
                 </div><!---Formbuilder Form--->
-                
+
                 <!--<div class="dropdown">
                               <button onclick="myFunction('myDropdown')" class="dropbtn" id="dropdownButton">Dropdown</button>
                               <div id="myDropdown" class="dropdown-content">
@@ -288,8 +397,8 @@
                                 <a href="#tools">Tools</a>
                               </div>
                             </div>-->
-                
-                
+
+
             </div>
         </div>
     </div>
@@ -310,6 +419,7 @@
                     </a>
                 </div>
             </div>
+            <!--
             <div class="col-12 col-md-3 mbr-fonts-style display-7">
                 <h5 class="pb-3">
                     Address
@@ -318,23 +428,24 @@
                     1234 Street Name
                     <br>City, AA 99999
                 </p>
-            </div>
+            </div>-->
             <div class="col-12 col-md-3 mbr-fonts-style display-7">
                 <h5 class="pb-3">
                     Contacts
                 </h5>
                 <p class="mbr-text">
                     Email: hello@alexgl.com
-                    <br>Phone: +1 (0) 000 0000 001
-                    <br>Fax: +1 (0) 000 0000 002
+                    <!--<br>Phone: +1 (0) 000 0000 001
+                    <br>Fax: +1 (0) 000 0000 002-->
                 </p>
             </div>
+            <!--
             <div class="col-12 col-md-3 mbr-fonts-style display-7">
                 <h5 class="pb-3">
                     Links
                 </h5>
                 <p class="mbr-text"><a class="text-warning" href="index.php">Recipe Prophet Home</a>&nbsp;<br><a class="text-warning" href="index.php">About Us</a><br><a class="text-warning" href="index.php">Help</a></p>
-            </div>
+            </div>-->
         </div>
         <div class="footer-lower">
             <div class="media-container-row">
@@ -351,15 +462,16 @@
                 <div class="col-md-6">
                     <div class="social-list align-right">
                         <div class="soc-item">
-                            <a href="https://twitter.com/volcanicmaster" target="_blank">
+                            <a href="https://twitter.com/AlexGVolcan" target="_blank">
                                 <span class="mbr-iconfont mbr-iconfont-social socicon-twitter socicon"></span>
                             </a>
                         </div>
+                        <!--
                         <div class="soc-item">
                             <a href="index.php" target="_blank">
                                 <span class="mbr-iconfont mbr-iconfont-social socicon-youtube socicon"></span>
                             </a>
-                        </div>
+                        </div>-->
                         
                         
                         
@@ -370,7 +482,7 @@
         </div>
     </div>
 </section>
-
+</div>
 <?php
             
     $conn->close();
@@ -384,19 +496,46 @@
     <script>
                 document.onclick = function(e){
                     //add this clickoff functionality to all dropdowns 
-                    if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
+                    /*if(e.target.id !== 'easyFilter' && e.target.id !== 'easyFilterButton'){
                       document.getElementById('easyFilter').style.display = 'none';
                     }
                     if(e.target.id !== 'lightFilter' && e.target.id !== 'lightFilterButton'){
                       document.getElementById('lightFilter').style.display = 'none';
-                    }
+                    }*/
                     if(e.target.id !== 'ingredientDropdown' && e.target.id !== 'search'){
                       document.getElementById('ingredientDropdown').style.display = 'none';
                     }
                 };
                 </script>
+    <script>
+        const sidebarMaxWidth = "500px";
+        var sidebarWidth = sidebarMaxWidth;
+        
+        function openNav() {
+            if(parseInt(window.screen.width) < parseInt(sidebarMaxWidth)){
+                console.log("screen width was lower than sidebarMaxWidth!");
+                sidebarWidth = window.screen.width;
+            }
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            //document.getElementById("main").style.marginLeft = "250px"; //move the main page
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            //document.getElementById("main").style.marginLeft = "0"; //move the main page
+        }
+        
+        function openOrCloseNav(){
+            if(parseInt(document.getElementById("mySidebar").style.width) > 0){
+               //already open, close it
+                closeNav();
+            } else {
+                openNav();
+            }
+        }
+    </script>
     <script src="scripts/dropdownSelection.js"></script>
-    <!--TODO: only run dropdownSelection after fillIngredientDropdown has completed?-->
+    <!--probably not necessary to change anything to make sure dropdownSelection only after fillIngredientDropdown has completed-->
     <script>
         const ingredientDropdown = document.getElementById('ingredientDropdown');
         
@@ -417,8 +556,8 @@
         }
 
         xmlhttp.open( "POST", "fillIngredientDropdown.php" );
-        xmlhttp.setRequestHeader( "Content-Type", "application/json" );
-        xmlhttp.send();//no need to send any data
+        xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
+        xmlhttp.send('TRUE');
     </script>
     <script>
         

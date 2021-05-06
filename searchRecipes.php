@@ -321,10 +321,10 @@ if ($result->num_rows > 0) {
         <div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="Salad, Easy, Light" onclick="location.href='index.html'"><div><img src="assets/images/mbr-10-1920x1280-800x533.jpg" alt="" title=""><span class="icon-focus"></span><span class="mbr-gallery-title mbr-fonts-style display-7">Caprese Salad</span></div></div>
         */
         
-        
+        //onclick functions set here.
         echo '<div class="mbr-gallery-item mbr-gallery-item--p1" data-video-url="false" data-tags="' 
             . $row["tags"] 
-            . '" onclick="window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;)' . '">';
+            . '" onclick="addRecent(' . $row["id"] . '); window.open(\'' . $row["link"] . '\'' . ', &quot;' . '_blank&quot;);' . '">';
         echo '<div class="crop">';
         echo '<img src="' . $row["imglink"] . '" alt="" title="">';
         echo '<span class="icon-focus"></span>';

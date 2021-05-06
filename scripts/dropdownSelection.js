@@ -39,7 +39,6 @@ function filterFunction(inputID,dropdownID) {
     lim = 0;
     pafter = [];
     disp = document.getElementById("homeMainDisplayDiv");
-
     
     //div.classList.show();
 
@@ -100,19 +99,39 @@ function selectElementFromTextArea(id,dropdownID,textAreaID,withDB){
     dropdown = document.getElementById(dropdownID);
     textArea = document.getElementById(textAreaID);
 
-    if(withDB){
+    //withDB = true;
+    if(withDB == 1){
         // add ingredients to database
+        console.log("withDB: addData");
         addData(selection.textContent, true);
     } else {
+        console.log("createListItem");
         createListItem(selection.textContent,id);
     }
 
     textArea.value = "";
     $(dropdown).toggle("show");
     //$(dropdown).hide();
+    
+    if(typeof document.getElementById("mySidebar") != "undefined"){
+        console.log("dropdownSelection: about to open openNav");
+        openNav();
+    }
+}
+
+//return the id of the first visible child of the dropdown
+function getFirstVisibleChild(dropdownID){
+    dropdown = document.getElementById(dropdownID);
+    
+    for(i = 0; i < dropdown.children.length; i++){
+        if(dropdown.children[i].style.display != "none"){
+            return dropdown.children[i].id;
+        }
+    }
 }
 
 //for custom ingredient lists
+
 function createListItem(ingName, ingID) {
     //ingredient list being constructed
     var list = document.getElementById("ingredients");
@@ -125,7 +144,7 @@ function createListItem(ingName, ingID) {
     idContainer.content = ingID;
     listItem.appendChild(idContainer);
 
-      //listItem.style.width = "200px";
+    //listItem.style.width = "200px";
     h3.style.float = "left";
     listItem.appendChild(h3);
     list.appendChild(listItem);
@@ -136,16 +155,19 @@ function createListItem(ingName, ingID) {
     // Create a button and place it inside each listItem
     const deleteBtn = document.createElement('button');
     listItem.appendChild(deleteBtn);
-    deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'btn btn-sm btn-secondary';
+    deleteBtn.style.padding = '0px 10px 0px 10px';
+    deleteBtn.textContent = 'X';
 
     // Set an event handler so that when the button is clicked, the deleteItem()
     // function is run
-    deleteBtn.onclick = deleteItem;
+    deleteBtn.onclick = deleteVisualItem;
 }
-function deleteItem(e) {
+function deleteVisualItem(e) {
+    //e.target IS THE DELETE BUTTON ITSELF
     //ingredient list being constructed
     var list = document.getElementById("ingredients");
-    list.removeChild(e.target);
+    list.removeChild(e.target.parentNode);
 
     //show the No ingredients selected message if there's nothing left
     /*if(!list.firstChild) {
@@ -153,4 +175,16 @@ function deleteItem(e) {
       listItem.textContent = 'No ingredients selected.';
       list.appendChild(listItem);
     }*/
+}
+//copy of openNav for pages with the sidebar (since we need to call openNav from within this script)
+function openNav() {
+    console.log("dropdownSelection: inside openNav");
+    const sidebarMaxWidth = "500px";
+    var sidebarWidth = sidebarMaxWidth;
+    if(parseInt(window.screen.width) < parseInt(sidebarMaxWidth)){
+        console.log("screen width was lower than sidebarMaxWidth!");
+        sidebarWidth = window.screen.width;
+    }
+    document.getElementById("mySidebar").style.width = sidebarWidth;
+    //document.getElementById("main").style.marginLeft = "250px"; //move the main page
 }

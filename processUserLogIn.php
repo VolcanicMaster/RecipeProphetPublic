@@ -5,9 +5,9 @@ session_start();
 if ( isset( $_POST['submit'] ) ){
     //verify that the information is correct
     // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-    if ($stmt = $conn->prepare('SELECT id, password FROM userAccounts WHERE username = ?')) {
+    if ($stmt = $conn->prepare('SELECT id, password FROM userAccounts WHERE email = ?')) {
         // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-        $stmt->bind_param('s', $_POST['username']);
+        $stmt->bind_param('s', $_POST['email']);
         $stmt->execute();
         // Store the result so we can check if the account exists in the database.
         $stmt->store_result();
@@ -23,23 +23,30 @@ if ( isset( $_POST['submit'] ) ){
                 // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
                 session_regenerate_id();
                 $_SESSION['userin'] = TRUE; //TODO actually use this value
-                $_SESSION['name'] = $_POST['username'];
+                $_SESSION['name'] = $_POST['email'];
                 $_SESSION['id'] = $id;
                 echo 'Welcome ' . $_SESSION['name'] . '!';
-                //header('Location: index.php');
-                //exit;
+                $_SESSION['message'] = 'Logged in successfully!';
+                header('Location: index.php');
+                exit;
             } else {
                 echo 'Incorrect password!';
+                $_SESSION['message'] = 'Incorrect email or password!';
+                header('Location: login.php');
+                exit;
             }
         } else {
-            echo 'Incorrect username!';
+            echo 'Incorrect email!';
+            $_SESSION['message'] = 'Incorrect email!';
+            header('Location: login.php');
+            exit;
         }
 
         $stmt->close();
     }
     //does this make login persistent while keeping info secure?
 } else {
-    exit('Please fill both the username and password fields!');
+    exit('Please fill both the email and password fields!');
 }
 
 ?>

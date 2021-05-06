@@ -33,6 +33,8 @@
         header('Location: adminLogin.php');
         exit; 
     }
+    
+    
     ?>
   
   
@@ -63,14 +65,19 @@
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
+            <!--<ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
                     <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
                         
                         About Us
                     </a>
-                </li></ul>
-            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
-                    Help</a></div>
+                </li></ul>-->
+            <div class="navbar-buttons mbr-section-btn">
+                <a id="loginBtn" class="btn btn-sm btn-primary display-4" href="login.php">
+                    <!--TODO add favorites page mbri-star-->
+                    <span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>
+                <a id="accountBtn" style="display: none" class="btn btn-sm btn-primary display-4" href="account.php">
+                    <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Account Preferences</a>
+            </div>
         </div>
     </nav>
 </section>
@@ -109,7 +116,17 @@
     
 </section>
     <?php
-        include "scripts/dbConnect.php"
+        include "scripts/dbConnect.php";
+            
+        if (isset($_SESSION['userin'])) {
+            //if($_SESSION['userin'] == TRUE){
+                //change log in button to account info button
+                echo '<script type="text/javascript">';
+                echo 'document.getElementById("loginBtn").style.display = "none";';
+                echo 'document.getElementById("accountBtn").style.display = "";';
+                echo '</script>';
+            //}
+        }
     ?>
     <script src="scripts/databaseManipulator.js"></script>
     <script>
@@ -164,6 +181,11 @@
         //TODO have commonality index and just order by that? sort by number of instances of ingredients in recipeIngredients?
         //TODO factor this commonality index into a summary score that will eventually factor in calculated user preference (the more times they say they don't have an ingredient, the lower the score? Goes back up if they say yes? )
         
+        ///
+        ///Fills the array ingsToPrompt which will be used to generate what prompts the user will see. Ends by calling askAboutIng()
+        ///Parameters: 
+        ///Returns: 
+        ///
         function ingPromptSetup(){
             //generate full list of ingredients from database
             //have two selects, pushed to the same array one after the other?: SELECT name,tags FROM ingredients WHERE tags LIKE "%Entree%" ORDER BY commonality DESC;

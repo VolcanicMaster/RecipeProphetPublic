@@ -24,7 +24,7 @@ if ( isset( $_POST['submit'] ) ){
                 session_regenerate_id();
                 $_SESSION['loggedin'] = TRUE;
                 $_SESSION['name'] = $_POST['username'];
-                $_SESSION['id'] = $id;
+                //$_SESSION['id'] = $id;
                 echo 'Welcome ' . $_SESSION['name'] . '!';
                 //header('Location: index.php');
                 //exit;

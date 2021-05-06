@@ -102,11 +102,27 @@ setUpCompleted = {
         
           //listItem.style.width = "200px";
           
+        // Create a button and place it inside each listItem
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-sm btn-secondary';
+        deleteBtn.style.padding = '0px 10px 0px 10px';
+        deleteBtn.textContent = 'X';
+        deleteBtn.style.float = "left";
+        listItem.appendChild(deleteBtn);
+        
+        // Set an event handler so that when the button is clicked, the deleteItem()
+        // function is run
+        deleteBtn.onclick = deleteItem;
           
-          h3.style.float = "left";
+        //h3.style.float = "left";
           //para.style.float = "left";
         listItem.appendChild(h3);
+        //listItem.appendChild(para);
+          
+        para.style.width = "0px";
+        para.style.padding = "0.01px 0px 0px 0px";
         listItem.appendChild(para);
+          
         list.appendChild(listItem);
 
         // Put the data from the cursor inside the h3 and para
@@ -116,14 +132,7 @@ setUpCompleted = {
         // which item it corresponds to. This will be useful later when we want to delete items
         listItem.setAttribute('data-note-id', cursor.value.id);
 
-        // Create a button and place it inside each listItem
-        const deleteBtn = document.createElement('button');
-        listItem.appendChild(deleteBtn);
-        deleteBtn.textContent = 'Delete';
-
-        // Set an event handler so that when the button is clicked, the deleteItem()
-        // function is run
-        deleteBtn.onclick = deleteItem;
+        
 
         // Iterate to the next item in the cursor
         cursor.continue();

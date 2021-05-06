@@ -38,8 +38,8 @@ if ($stmt = $conn->prepare('SELECT listID FROM userCustomLists WHERE name = ? AN
                 $stmtTwo->execute();
                 $stmtTwo->close();
             }
-        $stmt->close();
         }
+        $stmt->close();
     }
 }
 ?>

@@ -8,10 +8,10 @@
 <?php
 
 $iswithdb = file_get_contents( "php://input" );
-if($iswithdb == 'TRUE'){
-    $iswithdb = 1;
-} else {
+if($iswithdb == 'FALSE'){
     $iswithdb = 0;
+} else {
+    $iswithdb = 1;
 }
         
 echo '<div id="ingredientDropdown" class="dropdown-content">';
@@ -27,7 +27,7 @@ if ($result->num_rows > 0) {
         /*
         <p id="lettuceSelection" onclick="selectElementFromTextArea('lettuceSelection','ingredientDropdown','search')">Lettuce</p>
         */
-        echo '<p id="' . $row["id"] . '" onclick="selectElementFromTextArea(\'' . $row["id"] . '\',\'ingredientDropdown\',\'search\','. $iswithdb .')">' . $row["name"] . '</p>';
+        echo '<p id="' . $row["id"] . '" onclick="selectElementFromTextArea(\'' . $row["id"] . '\',\'ingredientDropdown\',\'search\',\''. $iswithdb .'\')">' . $row["name"] . '</p>';
     }
 }
 
