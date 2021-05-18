@@ -150,19 +150,19 @@
       transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
     }
 
-    /*."sidebar a" styles is unused rn*/
     /* The sidebar links */
-    .sidebar a {
-      padding: 8px 8px 8px 32px;
+    .sidebar li, .sidebar a {
       text-decoration: none;
-      font-size: 25px;
       color: #818181;
       display: block;
       transition: 0.3s;
     }
-
+    .sidebar a{
+        padding: 8px 8px 8px 32px;
+        font-size: 25px;
+    }
     /* When you mouse over the navigation links, change their color */
-    .sidebar a:hover {
+    .sidebar li:hover, .sidebar a:hover {
       color: #f1f1f1;
     }
 
@@ -189,7 +189,6 @@
       background-color: #444;
     }
 
-    /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
     #main {
       transition: margin-left .5s; /* If you want a transition effect */
     }
@@ -253,11 +252,11 @@
                 </li></ul>-->
             <div class="navbar-buttons mbr-section-btn"><!--<a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
                     Help</a>-->
-                <!--TODO readd login when sign up works-->
-                <!--<a class="btn btn-sm btn-primary display-4" href="login.php">-->
-                    <!--<span class="mbri-save mbr-iconfont mbr-iconfont-btn"></span>-->
-                    <!--TODO add logout button-->
-                    <!--<span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>-->
+                <a id="loginBtn" class="btn btn-sm btn-primary display-4" href="login.php">
+                    <!--TODO add favorites page mbri-star-->
+                    <span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>
+                <a id="accountBtn" style="display: none" class="btn btn-sm btn-primary display-4" href="account.php">
+                    <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Account Preferences</a>
             </div>
         </div>
     </nav>
@@ -456,7 +455,7 @@
             <div class="media-container-row mbr-white">
                 <div class="col-sm-6 copyright">
                     <p class="mbr-text mbr-fonts-style display-7">
-                        © Copyright 2020 Recipe Prophet - All Rights Reserved
+                        © Copyright 2021 Recipe Prophet - All Rights Reserved
                     </p>
                 </div>
                 <div class="col-md-6">
@@ -487,10 +486,18 @@
             
     $conn->close();
     //mysqli_close($conn);
+    
+    if (isset($_SESSION['userin'])) {
+        //if($_SESSION['userin'] == TRUE){
+            //change log in button to account info button
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("loginBtn").style.display = "none";';
+            echo 'document.getElementById("accountBtn").style.display = "";';
+            echo '</script>';
+        //}
+    }
 
-?>
-    
-    
+?>    
     
     <script src="scripts/databaseManipulator.js"></script>
     <script>
@@ -544,20 +551,34 @@
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 //do display results code in searchRecipes.php, then put the responseText in the gallery
-                console.log("entered onreadystatechange");
+                //console.log("entered onreadystatechange");
                 let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
                 let newIngredientDropdown = doc.getElementById("ingredientDropdown");
                 ingredientDropdown.parentNode.replaceChild(newIngredientDropdown, ingredientDropdown);
 
+                //add Enter key listener
+                const search = document.getElementById("search");
+                search.addEventListener("keydown", function (e) {
+                    if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+                        //add the top ingredient in the dropdown to the list
+                        //grab the first child with style that doesn't have "display:none;"
+                        selectElementFromTextArea(getFirstVisibleChild(ingredientDropdown.id),ingredientDropdown.id,search.id,1);
+                    }
+                });
+                
                 //TODO tags are present on the recipe elements, but not as buttons
 
-                console.log("ended onreadystatechange");
+                //console.log("ended onreadystatechange");
               }
         }
 
         xmlhttp.open( "POST", "fillIngredientDropdown.php" );
         xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
         xmlhttp.send('TRUE');
+        
+        
+    </script>
+    <script>
     </script>
     <script>
         

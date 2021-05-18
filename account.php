@@ -20,8 +20,8 @@
   <link rel="stylesheet" href="assets/gallery/style.css">
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
     
-    <!--TODO make code to redirect to login page if $_SESSION['id'] is not set-->
     
+    <!--redirect to login page if $_SESSION['id'] is not set-->
     <?php
     session_start();
     if (!isset($_SESSION['id'])){
@@ -77,6 +77,8 @@
           100% { transform: rotate(360deg); }
         }
         
+        
+        
         /* The sidebar menu */
         .sidebar {
           height: 100%; /* 100% Full-height */
@@ -112,6 +114,11 @@
             margin-left: 10%; /*same as width of sidebar*/
         }
 
+        .show {display: block;}
+        
+        .hide {
+          display:none;
+        }
     </style>
   
 </head>
@@ -120,7 +127,8 @@
     <!--use sidebar as menu? not collapsible this time-->
     <!--<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>-->
     <div >
-        <button class="btn btn-sm btn-primary display-4" onclick="">Recently Viewed Recipes</button>
+        <button class="btn btn-sm btn-primary display-4" onclick="getUserIDAndSendToGetRecents()">Recently Viewed Recipes</button>
+        <button class="btn btn-sm btn-primary display-4" onclick="getPreferences()">Preferences</button>
     </div>
 </div>
     <div id="main">
@@ -168,7 +176,7 @@
 
 
         <div id="rPRecipeContainer" class="container">
-            <div><!-- Filter --><!--<div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div>--><div><center><!--<a href="page1.php">Keep Searching for Recipes</a>--></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div><div id="recipeProphetRecipeGallery"><!--loading circle here--><div class="loader"></div></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+            <div><!-- Filter --><!--<div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div>--><div><center><!--<a href="page1.php">Keep Searching for Recipes</a>--></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div><div id="recipeProphetRecipeGallery"><!--loading circle here--></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
         
         </div>
 
@@ -195,19 +203,26 @@
             //console_log($test_string);
     ?>
     <script src="scripts/databaseManipulator.js"></script>
+    <script src="scripts/dropdownSelection.js"></script>
     <!--<script src="scripts/recipeSearch.js"></script>-->
     <script>
-        const recipeGallery = document.getElementById('recipeProphetRecipeGallery');
-        //const recipeGallery = document.getElementById('rPRecipeContainer');
-        
-        //remove all existing children from recipeGallery
-        /*while (recipeGallery.firstChild) {
-              recipeGallery.removeChild(recipeGallery.firstChild);
-            }*/
-        
-        function getUserIDAndSendToGetRecents(){
+        const recipeGallery = document.getElementById('recipeProphetRecipeGallery');   
+                
+        //linked to Preferences button
+        //send the userID to getPreferences.php, then display the output (the radio button lists or whatever it is will show the current setting)
+        function getPreferences(){
             if(recipeGallery.parentNode == null || recipeGallery == null){}else{
                 console.log("entered getLOIEtc");
+                
+                //remove all existing children from recipeGallery
+                while (recipeGallery.firstChild) {
+                      recipeGallery.removeChild(recipeGallery.firstChild);
+                }
+                
+                //create div with class loader
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                recipeGallery.appendChild(loader);
                 
                 var xmlhttp = new XMLHttpRequest;
 
@@ -218,7 +233,174 @@
                         let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
                         let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
                         //let newRecipeGallery = doc.getElementById("rPRecipeContainer");
-                        recipeGallery.parentNode.replaceChild(newRecipeGallery, recipeGallery);
+                        recipeGallery.replaceChild(newRecipeGallery, loader);
+                        
+                        //for each element in exclusionData, VISUALLY add the ingredients to match the database.
+                        let excData = document.getElementById("exclusionData");
+                        while(excData.firstChild){
+                            createListItem(excData.firstChild.getAttribute("data-exc-name"),excData.firstChild.getAttribute("data-exc-id"));
+                            excData.removeChild(excData.firstChild);
+                        }
+                        
+                        console.log("ended onreadystatechange");
+                      }
+                }
+
+                xmlhttp.open( "POST", "getPreferences.php" );
+                xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
+                xmlhttp.send(userid);
+            }
+        }
+        
+        //linked to I'm Vegan button in Preferences
+        //Preferences: VISUALLY add Vegan ingredients to the user's exclusions
+        function addVeganIngs(){
+            //done manually to reduce server load since the ingredients will rarely change
+            createListItem("Egg","1");
+            createListItem("Chicken","9");
+            createListItem("Mozzarella (Cheese)","10");
+            createListItem("Honey","61");
+            createListItem("Cheddar (Cheese)","25");
+            createListItem("Brie (Cheese)","26");
+            createListItem("Gouda (Cheese)","27");
+            createListItem("Feta (Cheese)","28");
+            createListItem("Parmesan (Cheese)","29");
+            createListItem("Mascarpone (Cheese)","30");
+            createListItem("(Pecorino) Romano (Cheese)","31");
+            createListItem("Camembert (Cheese)","32");
+            createListItem("Cream Cheese","33");
+            createListItem("Provolone (Cheese)","34");
+            createListItem("Gorgonzola (Cheese)","35");
+            createListItem("Stilton (Cheese)","36");
+            createListItem("Manchego (Cheese)","37");
+            createListItem("Monterey Jack (Cheese)","38");
+            createListItem("Gruyere (Cheese)","39");
+            createListItem("Blue Cheese","40");
+            createListItem("Goat Cheese","41");
+            createListItem("Whey","42");
+            createListItem("Milk","43");
+            createListItem("Sausage","103");
+            createListItem("Ham","104");
+            createListItem("Pepperoni","109");
+            createListItem("Pepperjack (Cheese)","110");
+            createListItem("Asiago (Cheese)","119");
+            createListItem("Cottage (Cheese)","123");
+            createListItem("Mayo","147");
+            createListItem("Beef","165");
+            createListItem("Fish","166");
+            createListItem("Fish Sauce","167");
+            createListItem("Tilapia","168");
+            createListItem("Pork","169");
+            createListItem("Lamb","170");
+            createListItem("Duck","171");
+            createListItem("Crab","172");
+            createListItem("Clam","173");
+            createListItem("Mussel","174");
+            createListItem("Ice Cream","175");
+            createListItem("Bacon","199");
+            createListItem("Halibut","200");
+            createListItem("American Cheese","202");
+            createListItem("Muenster (Cheese)","206");
+            createListItem("Soy (Sauce)","211");
+            createListItem("Swiss (Cheese)","216");
+            createListItem("Salami","223");
+            createListItem("Tuna","225");
+        }
+        
+        //linked to Clear All button in Preferences
+        //Preferences: VISUALLY Remove all exclusions
+        function clearExclusions(){
+            const exclusionList = document.getElementById("ingredients");
+            //remove all existing children from the ingredient list
+            while (exclusionList.firstChild) {
+                  exclusionList.removeChild(exclusionList.firstChild);
+            }
+            //readd title
+            exclusionList.textContent = "Exclusions: ";
+        }
+        
+        var ingids = [];
+        //helper function to get the ingredient id from the html
+        function getIngredientIDFromHTMLObject(item, index){
+            //add id to ingids js array
+            ingids.push(item.firstChild.content);
+        }
+
+        //linked to Save Changes button in Preferences
+        //Preferences: Save visual changes to database
+        function saveExclusions() {
+            console.log("entered saveExclusions");
+            var list = document.getElementById("ingredients");
+            
+            //check for oddities
+            if(!list.hasChildNodes()){
+                console.log("Unexpected: Exclusions title was not present");
+               return;
+            }
+            //reset the array (just in case)
+            ingids = [];
+            //remove the first child "Exclusions: "
+            list.removeChild(list.firstChild);
+            //get all ids from the ingredient list
+            list.childNodes.forEach(getIngredientIDFromHTMLObject);
+            console.log("ids retrieved from ingredient list");    
+
+            //send js array to php like in searchRecipes, convert ingids to php array.
+            var xmlhttp = new XMLHttpRequest;
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    //this part can be used to get the responseText and either display or just use it.
+                    console.log("entered onreadystatechange for sendToProcessCustomIngredientList");
+                    //let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+                    //let resultObj = doc.getElementById("result");
+                    //console.log(resultObj.textContent);
+
+                    //TODO check for errors and keep them on the page if there's something wrong for some reason?
+
+                    //send the user back to index.php and give them a pop up message saying the custom list has been added.
+                    <?php
+                    //$_SESSION['message'] = "Custom List added!"; 
+                    //header('Location: index.php');
+                    ?>
+                }
+            }
+
+            xmlhttp.open( "POST", "processExclusions.php" );
+            xmlhttp.setRequestHeader( "Content-Type", "application/json" );
+            xmlhttp.send( JSON.stringify(ingids) );
+            
+            //readd title
+            var textnode = document.createTextNode("Exclusions: ");
+            list.insertBefore(textnode, list.firstChild);
+        }
+        
+        //linked to Recently Viewed Recipes button
+        //send the userID to getRecents.php, then display the output
+        function getUserIDAndSendToGetRecents(){
+            if(recipeGallery.parentNode == null || recipeGallery == null){}else{
+                console.log("entered getLOIEtc");
+                
+                //remove all existing children from recipeGallery
+                while (recipeGallery.firstChild) {
+                      recipeGallery.removeChild(recipeGallery.firstChild);
+                }
+                
+                //create div with class loader
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                recipeGallery.appendChild(loader);
+                
+                var xmlhttp = new XMLHttpRequest;
+
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        //do display results code in searchRecipes.php, then put the responseText in the gallery
+                        console.log("entered onreadystatechange");
+                        let doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+                        let newRecipeGallery = doc.getElementById("newRecipeProphetRecipeGallery");
+                        //let newRecipeGallery = doc.getElementById("rPRecipeContainer");
+                        recipeGallery.replaceChild(newRecipeGallery, loader);
 
                         console.log("ended onreadystatechange");
                       }
@@ -227,16 +409,16 @@
                 xmlhttp.open( "POST", "getRecents.php" );
                 xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
                 xmlhttp.send(userid);
-                }
             }
+        }
         
-        recipeSearchDone = false;
+        //recipeSearchDone = false;
         
         if(recipeGallery.parentNode == null || recipeGallery == null){
            
         } else {
         
-            //instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
+            /*//instead of setUpDatabase.onsuccess, listen for a change in the setUpCompleted variable?
             setUpCompleted.registerListener(function(val) {
                 console.log("Changed the value of setUpCompleted.a to " + val);
                 if(val == true && !recipeSearchDone){
@@ -245,7 +427,7 @@
                     setUpCompleted.a = false;
                     recipeSearchDone = true;
                 }
-            });
+            });*/
 
             setUpDatabaseWithoutDisplay();
         }

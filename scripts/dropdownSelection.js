@@ -135,33 +135,51 @@ function getFirstVisibleChild(dropdownID){
 function createListItem(ingName, ingID) {
     //ingredient list being constructed
     var list = document.getElementById("ingredients");
+    
+    //the id used to quickly identify the ingredient
+    const idContainer = document.createElement('meta');
+    idContainer.content = ingID;
+    
+    //If an item with the same ingID is already in the list, exit.
+    for(var i = 0; list.children[i]; i++){
+        if(list.children[i].firstElementChild.content == ingID){
+           return;
+        }
+    }
+    
     // Create a list item, h3, and p to put each data item inside when displaying it
     // structure the HTML fragment, and append it inside the list
     const listItem = document.createElement('li');
     const h3 = document.createElement('h3');
-    const idContainer = document.createElement('meta');
-
-    idContainer.content = ingID;
+    const para = document.createElement('p');
+    
     listItem.appendChild(idContainer);
-
-    //listItem.style.width = "200px";
-    h3.style.float = "left";
-    listItem.appendChild(h3);
-    list.appendChild(listItem);
-
-    // Put the data from the cursor inside the h3 and para
-    h3.textContent = ingName;
-
+    
     // Create a button and place it inside each listItem
     const deleteBtn = document.createElement('button');
-    listItem.appendChild(deleteBtn);
     deleteBtn.className = 'btn btn-sm btn-secondary';
     deleteBtn.style.padding = '0px 10px 0px 10px';
     deleteBtn.textContent = 'X';
+    deleteBtn.style.float = "left";
+    listItem.appendChild(deleteBtn);
 
     // Set an event handler so that when the button is clicked, the deleteItem()
     // function is run
     deleteBtn.onclick = deleteVisualItem;
+
+    //listItem.style.width = "200px";
+    h3.style.float = "left";
+    // Put the data from the cursor inside the h3 and para
+    h3.textContent = ingName;
+    listItem.appendChild(h3);
+    
+    para.style.width = "0px";
+    para.style.padding = "0.01px 0px 0px 0px";
+    listItem.appendChild(para);
+    
+    list.appendChild(listItem);
+
+    
 }
 function deleteVisualItem(e) {
     //e.target IS THE DELETE BUTTON ITSELF

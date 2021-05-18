@@ -19,27 +19,26 @@
   <link rel="stylesheet" href="assets/theme/css/style.css">
   <link rel="stylesheet" href="assets/gallery/style.css">
   <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+    
     <?php
     //This locks pages behind a login. We can use it for test versions of pages. When we want to update the main page we can just copy in the new page and add this login again.
     session_start();
-    //header('Location: adminLogin.php');
-
+    
     if (isset($_SESSION['loggedin'])) {
         header('Location: page2Test.php');
         exit; 
-    } else {
-        
     }
     ?>
     
     <style>
-        #ingredientsSection {
-            overflow:hidden;
-            float:left;
-            width: 220px;
+        /*currently unused as it was replaced*/
+        #ingredientsAndGallerySection {
+            width: 100%;
         }
         #gallery1-8 {
-           float: left;
+           /*float: left;*/
+            width: 100%;
+	       margin: 0 auto;
         }
         #ingredients {
             margin-top: 100px;
@@ -74,10 +73,86 @@
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
+        
+        /* The sidebar menu */
+        .sidebar {
+          height: 100%; /* 100% Full-height */
+          width: 0; /* 0 width - change this with JavaScript */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Stay on top */
+          top: 0;
+          left: 0;
+          background-color: #111; /* Black*/
+          overflow-x: hidden; /* Disable horizontal scroll */
+          padding-top: 160px; /* Place content 60px from the top */
+          transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+        }
+
+        /* The sidebar links */
+        .sidebar li, .sidebar a {
+          text-decoration: none;
+          color: #818181;
+          display: block;
+          transition: 0.3s;
+        }
+        .sidebar a{
+            padding: 8px 8px 8px 32px;
+            font-size: 25px;
+        }
+        /* When you mouse over the navigation links, change their color */
+        .sidebar li:hover, .sidebar a:hover {
+          color: #f1f1f1;
+        }
+
+        /* Position and style the close button (top right corner) */
+        .sidebar .closebtn {
+          position: absolute;
+          top: 0;
+          right: 25px;
+          font-size: 36px;
+          margin-left: 300px;
+        }
+
+        /* The button used to open the sidebar */
+        .openbtn {
+          font-size: 20px;
+          cursor: pointer;
+          background-color: #111;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+        }
+
+        .openbtn:hover {
+          background-color: #444;
+        }
+
+        #main {
+          transition: margin-left .5s; /* If you want a transition effect */
+        }
+
+        /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+        @media screen and (max-height: 450px) {
+          .sidebar {padding-top: 15px;}
+          .sidebar a {font-size: 18px;}
+        }
     </style>
+    
+    
   
 </head>
 <body>
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; CLOSE</a>
+    <div >
+        <button class="btn btn-sm btn-primary display-4" onclick="addDefaultIngs()">Add Common Ingredients</button>
+        <!--TODO change this to an edit feature for Add Common Ingredients & readd custom list functionality and login when ready-->
+        <!--<button class="createCustomIngredientListBtn btn btn-sm display-4" onclick="location.href = 'createCustomIngredientList.php';">
+            <span class="mbri-plus mbr-iconfont mbr-iconfont-btn"></span>Create Custom Ingredient List <span class="mbri-sites mbr-iconfont mbr-iconfont-btn"></span></button>-->
+        <button class="btn btn-md btn-secondary display-4" onclick="clearIndexedDB()">Clear All</button>
+    </div>
+    <ul name="ingredients" id="ingredients">Ingredients: </ul>
+</div>
   <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-7">
 
     
@@ -103,30 +178,39 @@
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
+            <!--<ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item">
                     <a class="nav-link link text-white display-4" href="index.php"><span class="mbri-info mbr-iconfont mbr-iconfont-btn"></span>
                         
                         About Us
                     </a>
-                </li></ul>
-            <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="index.php"><span class="mbri-question mbr-iconfont mbr-iconfont-btn"></span>
-                    Help</a></div>
+                </li></ul>-->
+            <div class="navbar-buttons mbr-section-btn">
+                <a id="loginBtn" class="btn btn-sm btn-primary display-4" href="login.php">
+                    <!--TODO add favorites page mbri-star-->
+                    <span class="mbri-login mbr-iconfont mbr-iconfont-btn"></span>Log In To Save Data</a>
+                <a id="accountBtn" style="display: none" class="btn btn-sm btn-primary display-4" href="account.php">
+                    <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Account Preferences</a>
+            </div>
         </div>
     </nav>
 </section>
 
 <section id="ingredientsAndGallerySection">
-    <section id="ingredientsSection">
-        <div><ul name="ingredients" id="ingredients">Ingredients: </ul>
-        </div>
-    </section>
     <section class="mbr-gallery mbr-slider-carousel cid-rXMgNWDBnJ" id="gallery1-8">
 
-
+        <div class="container" >
+            <div class="row justify-content-center">
+                <div class="title col-12 col-lg-8">
+                    <div>
+                      <button class="openbtn" onclick="openOrCloseNav()">&#9776; See your current "inventory"</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="rPRecipeContainer" class="container">
 <!--TODO FAILURE: send the entire container in the xmlhttprequest to see if tags work? -->
-            <div><!-- Filter --><div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div><div><center><a href="page1.php">Keep Searching for Recipes</a></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div><div id="recipeProphetRecipeGallery"><!--TODO optional: Create loading circle here--><div class="loader"></div></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
+            <div><!-- Filter --><div class="mbr-gallery-filter container gallery-filter-active"><ul buttons="0"><li class="mbr-gallery-filter-all"><image width="50" src="assets/images/undo.png" onclick="history.back()"></image><a class="btn btn-md btn-primary-outline active display-7" href="">All</a></li></ul></div><div><center><a href="page1.php">Keep Searching for Recipes</a></center></div><!-- Gallery --><div class="mbr-gallery-row"><div class="mbr-gallery-layout-default"><div><div id="recipeProphetRecipeGallery"><!--loading circle here--><div class="loader"></div></div></div><div class="clearfix"></div></div></div><!-- Lightbox --><div data-app-prevent-settings="" class="mbr-slider modal fade carousel slide" tabindex="-1" data-keyboard="true" data-interval="false" id="lb-gallery1-8"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><ol class="carousel-indicators"><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="0"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="1"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="2"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="3"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="4"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="5"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" data-slide-to="6"></li><li data-app-prevent-settings="" data-target="#lb-gallery1-8" class=" active" data-slide-to="7"></li></ol><div class="carousel-inner"><div class="carousel-item"><img src="assets/images/mbr-10-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1287.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-5-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-9-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-3-1920x1280.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-1920x1281.jpg" alt="" title=""></div><div class="carousel-item"><img src="assets/images/mbr-7-1920x1280.jpg" alt="" title=""></div><div class="carousel-item active"><img src="assets/images/mbr-1920x1279.jpg" alt="" title=""></div></div><a class="carousel-control carousel-control-prev" role="button" data-slide="prev" href="#lb-gallery1-8"><span class="mbri-left mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Previous</span></a><a class="carousel-control carousel-control-next" role="button" data-slide="next" href="#lb-gallery1-8"><span class="mbri-right mbr-iconfont" aria-hidden="true"></span><span class="sr-only">Next</span></a><a class="close" href="#" role="button" data-dismiss="modal"><span class="sr-only">Close</span></a></div></div></div></div></div>
         
         </div>
 
@@ -150,9 +234,46 @@
             //escaping is not necessary / does not work if it's already escaped
             //$test_string = $conn->real_escape_string($test_string);
             //console_log($test_string);
+    
+            if (isset($_SESSION['userin'])) {
+                //if($_SESSION['userin'] == TRUE){
+                    //change log in button to account info button
+                    echo '<script type="text/javascript">';
+                    echo 'document.getElementById("loginBtn").style.display = "none";';
+                    echo 'document.getElementById("accountBtn").style.display = "";';
+                    echo '</script>';
+                //}
+            }
     ?>
     <script src="scripts/databaseManipulator.js"></script>
     <!--<script src="scripts/recipeSearch.js"></script>-->
+    <script>
+        const sidebarMaxWidth = "500px";
+        var sidebarWidth = sidebarMaxWidth;
+        
+        function openNav() {
+            if(parseInt(window.screen.width) < parseInt(sidebarMaxWidth)){
+                console.log("screen width was lower than sidebarMaxWidth!");
+                sidebarWidth = window.screen.width;
+            }
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            //document.getElementById("main").style.marginLeft = "250px"; //move the main page
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            //document.getElementById("main").style.marginLeft = "0"; //move the main page
+        }
+        
+        function openOrCloseNav(){
+            if(parseInt(document.getElementById("mySidebar").style.width) > 0){
+               //already open, close it
+                closeNav();
+            } else {
+                openNav();
+            }
+        }
+    </script>
     <script>
         const recipeGallery = document.getElementById('recipeProphetRecipeGallery');
         //const recipeGallery = document.getElementById('rPRecipeContainer');
@@ -229,6 +350,15 @@
         }
         
         
+    </script>
+    <script>
+    function addRecent(rid){
+        console.log("recipeid: " + rid);
+        var xmlhttp = new XMLHttpRequest;
+        xmlhttp.open( "POST", "addRecent.php" );
+        xmlhttp.setRequestHeader( "Content-Type", "text/plain" );
+        xmlhttp.send( rid );
+    }
     </script>
     
     <?php
